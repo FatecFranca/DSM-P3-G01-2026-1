@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Safe Bite - Registro de Receitas</title>
+    <link rel="icon" href="/Images/favicon.ico" />
+    <link rel="stylesheet" href="../Estilos/global.css">
+    <link rel="stylesheet" href="../Estilos/Tela_7 - public.css">
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header class="titulo" role="banner">
+        <!-- Botão do menu: onclick explícito, aria-expanded e data-attribute -->
+        <button id="btn_menu_vertical" aria-expanded="false" aria-controls="menu_vertical"
+                class="menu-alternar" onclick="toggleMenu()" data-menu-button>
+            <img src="../Images/menu_vertical.png" alt="Abrir menu">
+        </button>
+
+        <!-- Área do título centralizada. Quando menu estiver aberto, será deslocada via JS/CSS -->
+        <div class="safe-bite" aria-hidden="false">
+            <img src="../Images/titulo.png" alt="Safe Bite">
+            <p><strong>Uma mordida sempre pode ser saudável!</strong></p>
+        </div>
+
+        <button id="btn_perfil" class="perfil" aria-label="Perfil" type="button" onclick="perfilClick()">
+            <img id="foto-perfil-header" src="" alt="Foto de perfil" style="display: none;">
+            <div id="iniciais-perfil-header" class="iniciais-perfil-header"></div>
+        </button>
+    </header>
+
+    <!-- Overlay para cliques fora do menu -->
+    <div class="overlay" id="overlay" tabindex="-1" hidden onclick="closeMenu()"></div>
+
+    <!-- Menu Vertical -->
+     <!-- Adicionar rotas aos botões do menu! -->
+    <nav class="menu_vertical" id="menu_vertical" aria-hidden="true" role="navigation">
+        <ul>
+            <li><a href="tela_4 - menu-principal.html">Início</a></li>
+            <li><a href="tela_5 - instrucoes.html">Instruções</a></li>
+            <li><a href="Tela_6 - receitas.html">Receitas</a></li>
+            <li><a href="Tela_7 - public.html">Publicações</a></li>
+            <li><a href="tela_8 - suporte.html">Suporte</a></li>
+        </ul>
+
+        <div class="devs">
+            <h3>Desenvolvedores:</h3>
+            <p>Amanda C. Olegário</p>
+            <p>Gabriel Sanches Martins</p>
+            <p>Luis Eduardo de Campos</p>
+            <p>Martha Vitória Guidetti da Silva</p>
+        </div>
+    </nav>
+
+    <!-- Botão Voltar: Adicionar sua rota de "voltar" -->
+    <button id="btn_voltar" class="btn-voltar" onclick="goBack()" aria-label="Voltar">Voltar</button>
+
+    <!-- Conteúdo principal da página Registro de Receita -->
+    <main class="conteudo-registro-receita">
+        <h2 id="titulo-pagina">Registro de Receita</h2>
+
+        <form class="form-receita" id="form-receita">
+            <!-- Foto -->
+            <div class="foto-receita">
+                <label for="foto">Foto da Receita:</label>
+                <div class="upload-area" id="upload-area">
+                    <img id="preview-imagem" src="../Images/icone_camera.jpg" alt="Adicionar foto" class="icone-camera" style="display: none;">
+                    <img id="placeholder-camera" src="../Images/icone_camera.jpg" alt="Adicionar foto" class="icone-camera">
+                    <input type="file" id="foto" name="foto" accept="image/*" hidden>
+                </div>
+                <p id="nome-arquivo" style="margin-top: 0.5rem; font-size: 0.9rem; color: #666; display: none;"></p>
+            </div>
+
+            <!-- Propriedades -->
+            <div class="propriedades">
+                <label for="propriedades">Propriedades:</label>
+                <input type="text" id="propriedades" name="propriedades">
+            </div>
+
+            <!-- Nome -->
+            <div class="nome-receita">
+                <label for="nome">Nome da Receita:</label>
+                <input type="text" id="nome" name="nome">
+            </div>
+
+            <!-- Ingredientes -->
+            <div class="ingredientes">
+                <label for="ingredientes">Ingredientes:</label>
+                <textarea id="ingredientes" name="ingredientes"></textarea>
+            </div>
+
+            <!-- Tempo -->
+            <div class="tempo">
+                <label for="tempo">Tempo Estimado:</label>
+                <input type="text" id="tempo" name="tempo" placeholder="Ex: 30 minutos">
+            </div>
+
+            <!-- Rendimento -->
+            <div class="rendimento">
+                <label for="rendimento">Rendimento:</label>
+                <input type="text" id="rendimento" name="rendimento" placeholder="Ex: 4 porções">
+            </div>
+
+            <!-- Modo de preparo -->
+            <div class="modo-preparo">
+                <label for="modo">Modo de Preparo:</label>
+                <textarea id="modo" name="modo"></textarea>
+            </div>
+
+            <!-- Informação sobre detecção automática de restrições -->
+            <div class="restricoes-info" style="grid-column: 1 / -1; padding: 1rem; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                <p style="margin: 0; font-size: 0.9rem; color: #555;">
+                    <strong>ℹ️ Informação:</strong> As restrições alimentares são detectadas automaticamente com base nos ingredientes da receita.
+                </p>
+            </div>
+
+            <!-- Status -->
+            <div class="status-receita">
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="rascunho">Rascunho</option>
+                    <option value="publicada">Publicada</option>
+                </select>
+            </div>
+
+            <!-- Mensagens de erro/sucesso -->
+            <div id="mensagem-form" style="grid-column: 1 / -1; display: none; padding: 1rem; border-radius: 8px; margin-top: 1rem;"></div>
+
+            <!-- Botão Salvar -->
+            <button type="button" class="btn-salvar" id="btn-salvar">Salvar</button>
+        </form>
+    </main>
+
+    <!-- Scripts necessários -->
+    <script src="../Script/config.js"></script>
+    <script src="../Script/api.service.js"></script>
+    <script src="../Script/utils.js"></script>
+    <script>
+      // Verificar autenticação antes de carregar a página
+      (function() {
+        const token = localStorage.getItem('safebite_token');
+        if (!token) {
+          window.location.href = 'autenticacao/tela_1 - inicial.html';
+        }
+      })();
+    </script>
+
+    <!-- Scripts -->
+    <script src="../Script/Tela_7 - public.js"></script>
+
+    <footer>
+        <h4>"Ver a cozinha do Nelita pelas lentes dele, foi como enxergar meu próprio trabalho com outros olhos." - Tássia Magalhães.</h4>
+    </footer>    
+</body>
+</html>

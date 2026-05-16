@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - SafeBite</title>
+  <link rel="icon" href="/Images/favicon.ico">
+  <link rel="stylesheet" href="../../Estilos/tela_5 - login.css">
+</head>
+<body class="tela-login">
+  <a href="tela_1 - inicial.html" class="btn-voltar">Voltar</a>
+
+  <div class="form-container">  <img src="../../Images/logo.png"/>
+    <h2>Login</h2>
+    <form id="form-login">
+      
+      <div class="input-group">
+        <i class="fa-solid fa-user"></i>
+        <input type="email" id="email" placeholder="Insira seu email" />
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="senha" placeholder="Insira a senha" />
+      </div>
+      <label>
+        <a href="tela_6 - confemail.html" style="color: inherit; text-decoration: underline;">Esqueceu sua senha? Clique aqui!</a>
+      </label>
+
+      <button type="submit" class="btn-grad">Concluir</button>
+    </form>
+  </div>
+
+  <!-- Scripts necessários -->
+  <script src="../../Script/config.js"></script>
+  <script src="../../Script/api.service.js"></script>
+  <script src="../../Script/utils.js"></script>
+  <script src="../../Script/login.js"></script>
+</body>
+</html>
