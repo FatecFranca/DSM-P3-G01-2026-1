@@ -1,17 +1,18 @@
 const Joi = require('joi');
 
+// Regex para validar ObjectId do MongoDB (24 caracteres hexadecimais)
+const objectIdPattern = /^[0-9a-fA-F]{24}$/;
+
 /**
  * Schema de validação para adicionar restrição ao usuário
  */
 const addUserRestrictionSchema = Joi.object({
-  restriction_id: Joi.number()
-    .integer()
-    .positive()
+  restriction_id: Joi.string()
+    .pattern(objectIdPattern)
     .optional()
     .messages({
-      'number.base': 'O ID da restrição deve ser um número',
-      'number.integer': 'O ID da restrição deve ser um número inteiro',
-      'number.positive': 'O ID da restrição deve ser um número positivo'
+      'string.pattern.base': 'O ID da restrição deve ser um ObjectId válido (24 caracteres hexadecimais)',
+      'string.base': 'O ID da restrição deve ser uma string'
     }),
   nome: Joi.string()
     .min(2)
@@ -27,6 +28,10 @@ const addUserRestrictionSchema = Joi.object({
       'string.max': 'O nome deve ter no máximo 255 caracteres',
       'any.required': 'O nome é obrigatório quando não fornecendo restriction_id'
     }),
+  categoria: Joi.string()
+    .max(100)
+    .allow(null, '')
+    .optional(),
   palavras_chave: Joi.alternatives()
     .try(
       Joi.array().items(Joi.string().min(1)),
@@ -95,7 +100,6 @@ const validate = schema => {
       });
     }
 
-    // Substituir req.body pelos valores validados e sanitizados
     req.body = value;
     next();
   };
@@ -106,4 +110,3 @@ module.exports = {
   updateUserRestrictionSchema,
   validate
 };
-

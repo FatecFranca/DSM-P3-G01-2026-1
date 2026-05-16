@@ -45,9 +45,9 @@ function showError(error, container = null) {
     // Mensagens mais amigáveis para erros comuns
     if (error.status === 401) {
       message = 'Sessão expirada. Por favor, faça login novamente.';
-      // Opcional: redirecionar para login
+      // Redirecionar para tela de login
       setTimeout(() => {
-        window.location.href = 'Index/autenticacao/login.html';
+        window.location.href = '/Index/autenticacao/tela_3 - login.html';
       }, 2000);
     } else if (error.status === 403) {
       message = 'Você não tem permissão para realizar esta ação.';
@@ -363,6 +363,27 @@ async function carregarFotoPerfilHeader() {
   }
 }
 
+/**
+ * Aplica efeitos visuais de hover e press em um elemento
+ * @param {HTMLElement} element - Elemento a receber os efeitos
+ */
+function attachInteractiveEffects(element) {
+  if (!element) return;
+
+  element.addEventListener('mouseenter', () => element.classList.add('hovered'));
+  element.addEventListener('mouseleave', () => {
+    element.classList.remove('hovered');
+    element.classList.remove('pressed');
+  });
+  element.addEventListener('mousedown', () => element.classList.add('pressed'));
+  element.addEventListener('mouseup', () => element.classList.remove('pressed'));
+  element.addEventListener('touchstart', () => element.classList.add('pressed'), { passive: true });
+  element.addEventListener('touchend', () => {
+    element.classList.remove('pressed');
+    element.classList.remove('hovered');
+  }, { passive: true });
+}
+
 // Exportar funções para uso global
 window.utils = {
   showError,
@@ -372,10 +393,12 @@ window.utils = {
   disableButtonWithLoading,
   executeWithLoading,
   extrairIniciais,
-  carregarFotoPerfilHeader
+  carregarFotoPerfilHeader,
+  attachInteractiveEffects
 };
+
+window.attachInteractiveEffects = attachInteractiveEffects;
 
 // Exportar também globalmente para facilitar acesso
 window.extrairIniciais = extrairIniciais;
 window.carregarFotoPerfilHeader = carregarFotoPerfilHeader;
-

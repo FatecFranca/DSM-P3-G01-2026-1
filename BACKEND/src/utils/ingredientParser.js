@@ -46,7 +46,7 @@ const extractIngredients = textOrArray => {
 };
 
 const identifyRestrictionsFromIngredients = async ingredients => {
-  const all = await Restriction.findAll();
+  const all = await Restriction.find({});
   const results = [];
   const normalizedIngredients = ingredients.map(i => normalize(i));
   for (const r of all) {
@@ -57,7 +57,7 @@ const identifyRestrictionsFromIngredients = async ingredients => {
         if (!kw) continue;
         if (ing.includes(kw) || kw.includes(ing)) {
           results.push({
-            restrictionId: r.id,
+            restrictionId: r._id,
             restrictionName: r.nome,
             ingrediente: ing,
             matchedKeyword: kw

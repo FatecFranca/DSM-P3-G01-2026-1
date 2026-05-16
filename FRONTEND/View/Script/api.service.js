@@ -228,18 +228,18 @@ class ApiService {
    * Obtém todas as restrições do usuário logado
    */
   async getUserRestrictions() {
-    return this.request('/users/restrictions');
+    return this.request('/restrictions/users');
   }
 
   /**
    * Adiciona uma nova restrição ao usuário
-   * @param {number|object} restrictionData - Se número, é restriction_id. Se objeto, pode ter {restriction_id} ou {nome, palavras_chave}
+   * @param {string|object} restrictionData - Se string (ObjectId), é restriction_id. Se objeto, pode ter {restriction_id} ou {nome, palavras_chave}
    */
   async addUserRestriction(restrictionData) {
-    const body = typeof restrictionData === 'number' 
+    const body = (typeof restrictionData === 'string' || typeof restrictionData === 'number')
       ? { restriction_id: restrictionData }
       : restrictionData;
-    
+
     return this.request('/restrictions/users', {
       method: 'POST',
       body
@@ -247,32 +247,21 @@ class ApiService {
   }
 
   /**
-   * Adiciona uma nova restrição ao usuário (método legado)
-   * @deprecated Use addUserRestriction instead
-   */
-  async addRestriction(palavrasChave) {
-    return this.request('/users/restrictions', {
-      method: 'POST',
-      body: { palavras_chave: palavrasChave }
-    });
-  }
-
-  /**
    * Remove uma restrição do usuário
    */
   async removeRestriction(restrictionId) {
-    return this.request(`/users/restrictions/${restrictionId}`, {
+    return this.request(`/restrictions/users/${restrictionId}`, {
       method: 'DELETE'
     });
   }
 
   /**
-   * Atualiza as palavras-chave de uma restrição
+   * Atualiza as palavras-chave personalizadas de uma restrição do usuário
    */
   async updateRestriction(restrictionId, palavrasChave) {
-    return this.request(`/users/restrictions/${restrictionId}`, {
+    return this.request(`/restrictions/users/${restrictionId}`, {
       method: 'PUT',
-      body: { keywords: palavrasChave }
+      body: { palavras_chave_personalizadas: palavrasChave }
     });
   }
 

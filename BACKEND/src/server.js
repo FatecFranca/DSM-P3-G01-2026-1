@@ -150,9 +150,25 @@ app.use('/api', routes);
 app.use(notFound);
 app.use(errorHandler);
 
+// Seed automático: popula restrições alimentares se o banco estiver vazio
+const autoSeed = async () => {
+  try {
+    const Restriction = require('./models/Restriction');
+    const count = await Restriction.countDocuments();
+    if (count === 0) {
+      const { execSync } = require('child_process');
+      console.log('🌱 Banco vazio — populando restrições alimentares...');
+      execSync('node src/config/seed.js', { stdio: 'inherit', cwd: require('path').join(__dirname, '..') });
+    }
+  } catch (err) {
+    console.warn('⚠️  Seed automático falhou (não crítico):', err.message);
+  }
+};
+
 // Iniciar servidor após conectar ao MongoDB
 const startServer = async () => {
   await connectDB(); // ← Conecta ao MongoDB antes de abrir o servidor
+  await autoSeed();  // ← Popula restrições se banco estiver vazio
 
   app.listen(PORT, () => {
     logger.info('Servidor iniciado', {

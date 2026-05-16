@@ -3,18 +3,18 @@ const { verifyToken } = require('../utils/jwt');
 const User = require('../models/User');
 const BlacklistedToken = require('../models/BlacklistedToken');
 
+// Corrigido: era BlacklistedToken.findOne({ where: { token_hash } }) — Sequelize
+// Agora usa Mongoose: findOne({ token_hash })
 const isTokenBlacklisted = async token => {
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-  return BlacklistedToken.findOne({ where: { token_hash: tokenHash } });
+  return BlacklistedToken.findOne({ token_hash: tokenHash });
 };
 
 /**
  * Middleware de autenticação JWT
- * Verifica se o token é válido e adiciona o usuário à requisição
  */
 const authenticate = async (req, res, next) => {
   try {
-    // Obter token do header Authorization
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -24,7 +24,6 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // Formato esperado: "Bearer <token>"
     const parts = authHeader.split(' ');
 
     if (parts.length !== 2 || parts[0] !== 'Bearer') {
@@ -36,7 +35,6 @@ const authenticate = async (req, res, next) => {
 
     const token = parts[1];
 
-    // Verificar se token foi invalidado (logout)
     const blacklisted = await isTokenBlacklisted(token);
     if (blacklisted) {
       return res.status(401).json({
@@ -45,11 +43,11 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // Verificar e decodificar token
     const decoded = verifyToken(token);
 
-    // Buscar usuário no banco de dados
-    const user = await User.findByPk(decoded.userId);
+    // Corrigido: era User.findByPk() — Sequelize
+    // Agora usa Mongoose: User.findById()
+    const user = await User.findById(decoded.userId);
 
     if (!user) {
       return res.status(401).json({
@@ -58,9 +56,8 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // Adicionar usuário à requisição
     req.user = {
-      id: user.id,
+      id: user._id,
       email: user.email,
       nome_completo: user.nome_completo
     };
@@ -76,34 +73,29 @@ const authenticate = async (req, res, next) => {
 
 /**
  * Middleware opcional de autenticação
- * Não retorna erro se o token não for fornecido, apenas adiciona o usuário se válido
  */
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      return next();
-    }
+    if (!authHeader) return next();
 
     const parts = authHeader.split(' ');
-
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return next();
-    }
+    if (parts.length !== 2 || parts[0] !== 'Bearer') return next();
 
     const token = parts[1];
+
     const blacklisted = await isTokenBlacklisted(token);
-    if (blacklisted) {
-      return next();
-    }
+    if (blacklisted) return next();
 
     const decoded = verifyToken(token);
-    const user = await User.findByPk(decoded.userId);
+
+    // Corrigido: era User.findByPk() — Sequelize
+    const user = await User.findById(decoded.userId);
 
     if (user) {
       req.user = {
-        id: user.id,
+        id: user._id,
         email: user.email,
         nome_completo: user.nome_completo
       };
@@ -114,7 +106,5 @@ const optionalAuth = async (req, res, next) => {
     next();
   }
 };
-module.exports = {
-  authenticate,
-  optionalAuth
-};
+
+module.exports = { authenticate, optionalAuth };

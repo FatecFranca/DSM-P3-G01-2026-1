@@ -7,7 +7,6 @@ const authRoutes = require('./auth.routes');
 const testRoutes = require('./test.routes');
 const userRoutes = require('./user.routes');
 const restrictionRoutes = require('./restriction.routes');
-const userRestrictionsRoutes = require('./userRestrictions.routes');
 
 /**
  * @swagger
@@ -47,6 +46,5 @@ router.use('/test', testRoutes);
 router.use('/users', userRoutes);
 router.use('/recipes', recipeRoutes);
 router.use('/restrictions', restrictionRoutes);
-router.use('/users/restrictions', userRestrictionsRoutes);
 
 module.exports = router;

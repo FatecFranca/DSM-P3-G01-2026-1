@@ -143,11 +143,6 @@ async function handleLogin(e) {
     );
 
     if (response && response.data) {
-      // Salvar token de autenticação
-      if (response.data.token) {
-        window.apiService.setToken(response.data.token);
-      }
-
       // Verificar se o usuário tem restrição e se já cadastrou restrições
       const user = response.data.user;
       if (user && user.tem_restricao) {

@@ -46,7 +46,15 @@ const recipeSchema = new mongoose.Schema(
       default: null
     },
     restricoes_detectadas: {
-      type: [String],
+      type: [
+        {
+          ingrediente: { type: String, required: true },
+          palavras_chave: { type: [String], default: [] },
+          restricao_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Restriction', default: null },
+          restricao_nome: { type: String, default: null },
+          detectado_em: { type: Date, default: Date.now }
+        }
+      ],
       default: []
     },
     imagem_url: {

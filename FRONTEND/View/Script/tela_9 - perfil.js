@@ -240,29 +240,23 @@ async function editarRestricoes() {
                 throw new Error('Serviço de API não disponível');
             }
 
-            // Buscar restrições do usuário primeiro
-            const response = await window.apiService.request('/restrictions/users');
+            // Buscar restrições do usuário usando o método correto do apiService
+            const response = await window.apiService.getUserRestrictions();
 
-            let restricoes = [];
-            if (response.success && response.data) {
-                restricoes = Array.isArray(response.data) ? response.data : [];
-            } else if (Array.isArray(response)) {
-                restricoes = response;
-            } else if (response.data && Array.isArray(response.data)) {
-                restricoes = response.data;
-            }
+            const restricoes = (response && response.success && Array.isArray(response.data))
+                ? response.data
+                : [];
 
             if (restricoes.length > 0) {
                 // Atualizar palavras-chave personalizadas da primeira restrição do usuário
                 const primeiraRestricao = restricoes[0];
                 const userRestrictionId = primeiraRestricao.id; // ID do UserRestriction, não da Restriction
 
-                // Atualizar palavras_chave_personalizadas via API
-                // Usar /api/restrictions/users/:id que atualiza palavras_chave_personalizadas
-                await window.apiService.request(`/restrictions/users/${userRestrictionId}`, {
-                    method: 'PUT',
-                    body: { palavras_chave_personalizadas: novasRestricoes.trim() }
-                });
+                // Usar o método correto do apiService
+                await window.apiService.updateRestriction(
+                    userRestrictionId,
+                    novasRestricoes.trim()
+                );
 
                 // Atualizar interface
                 restricoesValor.textContent = novasRestricoes.trim();
@@ -365,27 +359,7 @@ function abrirReceita(receitaId) {
 
 // ==================== EFEITOS VISUAIS ====================
 // Aplica listeners para adicionar/remover classes .hovered e .pressed
-function attachInteractiveEffects(element) {
-    if (!element) return;
-
-    // Hover em desktop (mouseenter / mouseleave)
-    element.addEventListener('mouseenter', () => element.classList.add('hovered'));
-    element.addEventListener('mouseleave', () => {
-        element.classList.remove('hovered');
-        element.classList.remove('pressed');
-    });
-
-    // Press / release
-    element.addEventListener('mousedown', () => element.classList.add('pressed'));
-    element.addEventListener('mouseup', () => element.classList.remove('pressed'));
-
-    // Touch support (mobile)
-    element.addEventListener('touchstart', () => element.classList.add('pressed'), {passive: true});
-    element.addEventListener('touchend', () => {
-        element.classList.remove('pressed');
-        element.classList.remove('hovered');
-    }, {passive: true});
-}
+// attachInteractiveEffects está definida em utils.js (window.attachInteractiveEffects)
 
 // ==================== INICIALIZAÇÃO ====================
 function init() {
@@ -767,47 +741,15 @@ function preencherDadosUsuario(userData) {
     }
 }
 
-/**
- * Extrai as iniciais do nome completo
- * Considera nomes compostos: primeira letra do primeiro nome + primeira letra do último nome
- * @param {string} nomeCompleto - Nome completo do usuário
- * @returns {string} - Iniciais (ex: "SB" para "Sebastião Barbosa Torres")
- */
-function extrairIniciais(nomeCompleto) {
-    if (!nomeCompleto || typeof nomeCompleto !== 'string') {
-        return 'U'; // Default para "Usuário"
-    }
-    
-    // Remover espaços extras e dividir em palavras
-    const palavras = nomeCompleto.trim().split(/\s+/).filter(p => p.length > 0);
-    
-    if (palavras.length === 0) {
-        return 'U';
-    }
-    
-    if (palavras.length === 1) {
-        // Se só tem uma palavra, usar as duas primeiras letras
-        const primeiraPalavra = palavras[0];
-        return primeiraPalavra.substring(0, 2).toUpperCase();
-    }
-    
-    // Pegar primeira letra do primeiro nome e primeira letra do último nome
-    const primeiroNome = palavras[0];
-    const ultimoNome = palavras[palavras.length - 1];
-    
-    const primeiraInicial = primeiroNome.charAt(0).toUpperCase();
-    const ultimaInicial = ultimoNome.charAt(0).toUpperCase();
-    
-    return primeiraInicial + ultimaInicial;
-}
+// Nota: extrairIniciais está definida em utils.js e disponível via window.extrairIniciais
 
 // Carregar restrições do usuário
 async function carregarRestricoes() {
     try {
         console.log('📡 Carregando restrições do usuário...');
         
-        // Usar /api/restrictions/users que retorna { success: true, data: [...] }
-        const response = await window.apiService.request('/restrictions/users');
+        // Usar método correto do apiService
+        const response = await window.apiService.getUserRestrictions();
 
         console.log('✅ Resposta das restrições:', response);
 
@@ -815,15 +757,10 @@ async function carregarRestricoes() {
             return;
         }
 
-        // A API pode retornar { success: true, data: [...] } ou diretamente [...]
-        let restricoes = [];
-        if (response.success && response.data) {
-            restricoes = Array.isArray(response.data) ? response.data : [];
-        } else if (Array.isArray(response)) {
-            restricoes = response;
-        } else if (Array.isArray(response.data)) {
-            restricoes = response.data;
-        }
+        // A API retorna { success: true, data: [...] }
+        const restricoes = (response.success && Array.isArray(response.data))
+            ? response.data
+            : [];
 
         // Processar e exibir restrições
         if (restricoes.length > 0) {

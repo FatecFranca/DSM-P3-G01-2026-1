@@ -224,65 +224,75 @@ function mapearDadosReceita(receitaData, userRestrictionIds = new Set()) {
         propriedades = [receitaData.descricao];
     }
     
-    // Processar restrições com palavras-chave
+    // Processar restrições — exibir apenas as que o usuário possui
     let restricoes = [];
-    if (receitaData.restrictions && Array.isArray(receitaData.restrictions)) {
-        restricoes = receitaData.restrictions.map(r => {
-            const restrictionId = r.restriction?.id || r.restriction_id;
-            const nomeRestricao = r.restriction?.nome || r.restricao_nome || 'Restrição desconhecida';
-            const ingrediente = r.ingrediente_restritivo || '';
-            
-            // Verificar se o usuário tem esta restrição
-            const usuarioTemRestricao = restrictionId && userRestrictionIds.has(restrictionId);
-            
-            // Obter palavras-chave
-            let palavrasChave = [];
-            if (r.restriction && r.restriction.palavras_chave) {
-                palavrasChave = Array.isArray(r.restriction.palavras_chave) 
-                    ? r.restriction.palavras_chave 
-                    : (typeof r.restriction.palavras_chave === 'string' 
-                        ? r.restriction.palavras_chave.split(',').map(k => k.trim()).filter(k => k)
-                        : []);
-            } else if (r.palavras_chave) {
-                palavrasChave = Array.isArray(r.palavras_chave) 
-                    ? r.palavras_chave 
-                    : (typeof r.palavras_chave === 'string' 
-                        ? r.palavras_chave.split(',').map(k => k.trim()).filter(k => k)
-                        : []);
-            }
-            
-            // Construir texto da restrição com ícone de alerta se o usuário tiver
-            let textoRestricao = '';
-            
-            // Adicionar ícone de alerta se o usuário tiver esta restrição
-            if (usuarioTemRestricao) {
-                textoRestricao += '<span class="icone-alerta-restricao" aria-label="Você tem esta restrição">⚠️</span> ';
-            }
-            
-            textoRestricao += `<strong>${nomeRestricao}</strong>`;
-            
-            if (ingrediente) {
-                textoRestricao += `: ${ingrediente}`;
-            }
-            
-            if (palavrasChave.length > 0) {
-                textoRestricao += `<br><span style="font-size: 0.9em; color: #666; margin-left: 1rem;">Palavras-chave: ${palavrasChave.join(', ')}</span>`;
-            }
-            
-            return {
-                texto: textoRestricao,
-                temAlerta: usuarioTemRestricao
-            };
+    const usuarioLogado = window.apiService && window.apiService.isAuthenticated();
+    const usuarioTemAlgumaRestricao = userRestrictionIds.size > 0;
+
+    if (receitaData.restrictions && Array.isArray(receitaData.restrictions) && receitaData.restrictions.length > 0) {
+
+        // Filtrar apenas as restrições que o usuário cadastrou
+        const restricoeDoUsuario = receitaData.restrictions.filter(r => {
+            const restrictionId = r.restriction?.id || r.restriction_id || r.restricao_id;
+            if (!restrictionId) return false;
+            return Array.from(userRestrictionIds).some(uid => uid.toString() === restrictionId.toString());
         });
-        
-        if (restricoes.length === 0) {
-            restricoes = [{ texto: 'Nenhuma restrição identificada.', temAlerta: false }];
+
+        if (!usuarioLogado) {
+            // Usuário não autenticado: lista todas as restrições da receita sem filtro
+            restricoes = receitaData.restrictions.map(r => {
+                const nomeRestricao = r.restriction?.nome || r.restricao_nome || 'Restrição desconhecida';
+                const ingrediente = r.ingrediente_restritivo || r.ingrediente || '';
+                let palavrasChave = r.restriction?.palavras_chave || r.palavras_chave || [];
+                if (!Array.isArray(palavrasChave)) palavrasChave = [];
+                let texto = '<strong>' + nomeRestricao + '</strong>';
+                if (ingrediente) texto += ': ' + ingrediente;
+                if (palavrasChave.length > 0) {
+                    texto += '<br><span style="font-size:0.85em;color:#888;margin-left:1rem;">Palavras-chave: ' + palavrasChave.join(', ') + '</span>';
+                }
+                return { texto, temAlerta: false };
+            });
+
+        } else if (!usuarioTemAlgumaRestricao) {
+            // Usuário logado mas sem restrições cadastradas
+            restricoes = [{
+                texto: '✅ <strong>Você não possui restrições cadastradas.</strong><br><span style="font-size:0.9em;color:#555;">Acesse seu perfil para cadastrar suas restrições alimentares.</span>',
+                temAlerta: false
+            }];
+
+        } else if (restricoeDoUsuario.length === 0) {
+            // Usuário tem restrições mas nenhuma conflita com esta receita
+            restricoes = [{
+                texto: '✅ <strong>Esta receita é compatível com suas restrições!</strong><br><span style="font-size:0.9em;color:#2e7d32;">Nenhum ingrediente conflita com suas restrições alimentares.</span>',
+                temAlerta: false
+            }];
+
+        } else {
+            // Usuário tem restrições que conflitam — mostrar apenas essas
+            restricoes = restricoeDoUsuario.map(r => {
+                const nomeRestricao = r.restriction?.nome || r.restricao_nome || 'Restrição desconhecida';
+                const ingrediente = r.ingrediente_restritivo || r.ingrediente || '';
+                let palavrasChave = r.restriction?.palavras_chave || r.palavras_chave || [];
+                if (!Array.isArray(palavrasChave)) palavrasChave = [];
+                let texto = '<span class="icone-alerta-restricao" aria-label="Atenção">⚠️</span> ';
+                texto += '<strong>' + nomeRestricao + '</strong>';
+                if (ingrediente) texto += ': ' + ingrediente;
+                if (palavrasChave.length > 0) {
+                    texto += '<br><span style="font-size:0.85em;color:#888;margin-left:1rem;">Palavras-chave: ' + palavrasChave.join(', ') + '</span>';
+                }
+                return { texto, temAlerta: true };
+            });
         }
+
     } else {
-        restricoes = [{ texto: 'Nenhuma restrição identificada.', temAlerta: false }];
+        // Receita sem nenhuma restrição detectada
+        restricoes = [{
+            texto: '✅ <strong>Nenhuma restrição alimentar identificada nesta receita.</strong>',
+            temAlerta: false
+        }];
     }
-    
-    // Processar imagem
+
+        // Processar imagem
     let imagemUrl = '../Images/suco_detox.jpg'; // Imagem padrão
     if (receitaData.imagem_url) {
         if (receitaData.imagem_url.startsWith('http://') || receitaData.imagem_url.startsWith('https://')) {
@@ -505,4 +515,3 @@ window.closeMenu = closeMenu;
 window.goBack = goBack;
 
 document.addEventListener('DOMContentLoaded', init);
-

@@ -46,27 +46,7 @@ window.perfilClick = perfilClick;
 
 
 // --- Efeitos de hover / press controlados por JS ---
-function attachInteractiveEffects(element) {
-    if (!element) return;
-
-    // Hover em desktop (mouseenter / mouseleave)
-    element.addEventListener('mouseenter', () => element.classList.add('hovered'));
-    element.addEventListener('mouseleave', () => {
-        element.classList.remove('hovered');
-        element.classList.remove('pressed'); // remove pressed se ainda estiver
-    });
-
-    // Press / release
-    element.addEventListener('mousedown', () => element.classList.add('pressed'));
-    element.addEventListener('mouseup', () => element.classList.remove('pressed'));
-
-    // Touch support (mobile)
-    element.addEventListener('touchstart', () => element.classList.add('pressed'), {passive: true});
-    element.addEventListener('touchend', () => {
-        element.classList.remove('pressed');
-        element.classList.remove('hovered');
-    }, {passive: true});
-}
+// attachInteractiveEffects está definida em utils.js (window.attachInteractiveEffects)
 
 // Usar função compartilhada do utils.js
 

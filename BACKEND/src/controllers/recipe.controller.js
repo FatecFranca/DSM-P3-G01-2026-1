@@ -474,7 +474,7 @@ const createRecipe = async (req, res) => {
               palavras_chave: [m.matchedKeyword],
               restricao_id: m.restrictionId,
               restricao_nome: m.restrictionName,
-              detectado_em: new Date().toISOString()
+              detectado_em: new Date()
             };
           });
 
@@ -598,7 +598,7 @@ const updateRecipe = async (req, res) => {
             palavras_chave: [m.matchedKeyword],
             restricao_id: m.restrictionId,
             restricao_nome: m.restrictionName,
-            detectado_em: new Date().toISOString()
+            detectado_em: new Date()
           }));
 
           // Atualizar recipe_restrictions

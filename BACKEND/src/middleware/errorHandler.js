@@ -31,7 +31,7 @@ const errorHandler = (err, req, res, _next) => {
   };
 
   // Tratamento específico por tipo de erro
-  if (err.name === 'ValidationError' || err.name === 'SequelizeValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'MongoServerError' && err.code === 11000) {
     response.message = getErrorMessage('VALIDATION_ERROR');
     response.errors = err.errors || err.details || [err.message];
     return res.status(400).json(response);
@@ -46,7 +46,7 @@ const errorHandler = (err, req, res, _next) => {
     return res.status(401).json(response);
   }
 
-  if (err.name === 'SequelizeUniqueConstraintError') {
+  if (err.code === 11000) {
     response.message = getErrorMessage('ALREADY_EXISTS');
     if (err.errors && err.errors[0]?.path === 'email') {
       response.message = getErrorMessage('EMAIL_ALREADY_EXISTS');
@@ -54,7 +54,7 @@ const errorHandler = (err, req, res, _next) => {
     return res.status(409).json(response);
   }
 
-  if (err.name === 'SequelizeDatabaseError' || err.name === 'SequelizeConnectionError') {
+  if (err.name === 'MongoNetworkError' || err.name === 'MongoServerSelectionError') {
     response.message = getErrorMessage('DATABASE_ERROR');
     return res.status(500).json(response);
   }
