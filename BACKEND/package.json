@@ -12,8 +12,6 @@
     "test:recipes": "jest tests/recipe.test.js",
     "test:restrictions": "jest tests/restriction.test.js",
     "test:users": "jest tests/user.test.js",
-    "migrate": "node src/config/migrate.js",
-    "seed": "node src/config/seed.js",
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
     "format": "prettier --write \"src/**/*.js\"",
@@ -23,7 +21,7 @@
     "check:env": "node scripts/check-env.js",
     "docker:up": "docker-compose -f docker-compose.dev.yml up -d",
     "docker:down": "docker-compose -f docker-compose.dev.yml down",
-    "docker:logs": "docker-compose -f docker-compose.dev.yml logs -f postgres",
+    "docker:logs": "docker-compose -f docker-compose.dev.yml logs -f mongodb",
     "docker:reset": "docker-compose -f docker-compose.dev.yml down -v && docker-compose -f docker-compose.dev.yml up -d"
   },
   "keywords": [
@@ -44,10 +42,9 @@
     "helmet": "^7.1.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
-    "pg": "^8.11.3",
-    "sequelize": "^6.35.0",
     "sharp": "^0.33.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"

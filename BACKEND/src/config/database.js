@@ -1,45 +1,34 @@
 require('dotenv').config();
-const { Sequelize } = require('sequelize');
+const mongoose = require('mongoose');
 
-// Configuração do banco de dados
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: 'postgres',
-  logging: false, // Logs são gerenciados pelo logger customizado
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000
-  },
-  define: {
-    timestamps: true,
-    underscored: true,
-    underscoredAll: true
-  }
-});
-
-// Testar conexão
-const testConnection = async () => {
+const connectDB = async () => {
   try {
-    await sequelize.authenticate();
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: process.env.DB_NAME || 'safebite_db'
+    });
+
     const logger = require('../utils/logger');
-    logger.info('Conexão com o banco de dados estabelecida com sucesso', {
-      database: process.env.DB_NAME,
-      host: `${process.env.DB_HOST}:${process.env.DB_PORT}`
+    logger.info('Conexão com MongoDB estabelecida com sucesso', {
+      host: conn.connection.host,
+      database: conn.connection.name
     });
   } catch (error) {
     const logger = require('../utils/logger');
-    logger.error('Erro ao conectar com o banco de dados', error, {
-      database: process.env.DB_NAME,
-      host: `${process.env.DB_HOST}:${process.env.DB_PORT}`,
-      message: 'Verifique se o PostgreSQL está rodando e se as credenciais no .env estão corretas'
+    logger.error('Erro ao conectar com o MongoDB', error, {
+      uri: process.env.MONGODB_URI,
+      message: 'Verifique se o MongoDB está rodando e se MONGODB_URI no .env está correto'
     });
+    process.exit(1);
   }
 };
 
-module.exports = {
-  sequelize,
-  testConnection
-};
+// Eventos de conexão
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB desconectado');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.info('MongoDB reconectado');
+});
+
+module.exports = { connectDB };

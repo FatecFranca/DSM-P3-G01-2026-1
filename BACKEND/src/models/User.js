@@ -1,117 +1,89 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const User = sequelize.define(
-  'User',
+const userSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     nome_completo: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'O nome completo é obrigatório'
-        },
-        len: {
-          args: [2, 255],
-          msg: 'O nome deve ter entre 2 e 255 caracteres'
-        }
-      }
+      type: String,
+      required: [true, 'O nome completo é obrigatório'],
+      trim: true,
+      minlength: [2, 'O nome deve ter entre 2 e 255 caracteres'],
+      maxlength: [255, 'O nome deve ter entre 2 e 255 caracteres']
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: {
-        name: 'email',
-        msg: 'Este email já está cadastrado'
-      },
-      validate: {
-        isEmail: {
-          msg: 'Email inválido'
-        },
-        notEmpty: {
-          msg: 'O email é obrigatório'
-        }
-      }
+      type: String,
+      required: [true, 'O email é obrigatório'],
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Email inválido']
     },
     senha_hash: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'A senha é obrigatória'
-        }
-      }
+      type: String,
+      required: [true, 'A senha é obrigatória'],
+      select: false // Não retorna por padrão (equivale ao defaultScope do Sequelize)
     },
     telefone: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        len: {
-          args: [0, 20],
-          msg: 'O telefone deve ter no máximo 20 caracteres'
-        }
-      }
+      type: String,
+      default: null,
+      maxlength: [20, 'O telefone deve ter no máximo 20 caracteres']
     },
     idade: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      validate: {
-        min: {
-          args: [0],
-          msg: 'A idade deve ser um número positivo'
-        },
-        max: {
-          args: [150],
-          msg: 'A idade deve ser um número válido'
-        }
-      }
+      type: Number,
+      default: null,
+      min: [0, 'A idade deve ser um número positivo'],
+      max: [150, 'A idade deve ser um número válido']
     },
     foto_perfil: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      default: null
     },
     email_verificado: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+      type: Boolean,
+      default: false
     },
     token_verificacao_email: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      default: null,
+      select: false
     },
     token_recuperacao_senha: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      default: null,
+      select: false
     },
     data_expiracao_token: {
-      type: DataTypes.DATE,
-      allowNull: true
+      type: Date,
+      default: null,
+      select: false
     },
     tem_restricao: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-      comment: 'Indica se o usuário tem restrições alimentares'
+      type: Boolean,
+      required: true,
+      default: false
     }
   },
   {
-    tableName: 'users',
-    timestamps: true,
-    underscored: true,
-    defaultScope: {
-      attributes: { exclude: ['senha_hash', 'token_verificacao_email', 'token_recuperacao_senha'] }
-    },
-    scopes: {
-      withPassword: {
-        attributes: { include: ['senha_hash'] }
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        delete ret.senha_hash;
+        delete ret.token_verificacao_email;
+        delete ret.token_recuperacao_senha;
+        delete ret.data_expiracao_token;
+        return ret;
       }
     }
   }
 );
 
-module.exports = User;
+// Equivalente ao scope "withPassword" do Sequelize
+userSchema.statics.findWithPassword = function (filter) {
+  return this.findOne(filter).select('+senha_hash');
+};
 
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;

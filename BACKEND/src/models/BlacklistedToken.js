@@ -1,18 +1,34 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const BlacklistedToken = sequelize.define(
-  'BlacklistedToken',
+const blacklistedTokenSchema = new mongoose.Schema(
   {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    token_hash: { type: DataTypes.STRING(128), allowNull: false, unique: true },
-    expires_at: { type: DataTypes.DATE, allowNull: true }
+    token_hash: {
+      type: String,
+      required: true,
+      unique: true,
+      maxlength: 128
+    },
+    expires_at: {
+      type: Date,
+      default: null
+    }
   },
   {
-    tableName: 'blacklisted_tokens',
-    timestamps: true,
-    underscored: true
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      }
+    }
   }
 );
+
+// TTL index: MongoDB remove automaticamente tokens expirados
+blacklistedTokenSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
+
+const BlacklistedToken = mongoose.model('BlacklistedToken', blacklistedTokenSchema);
 
 module.exports = BlacklistedToken;

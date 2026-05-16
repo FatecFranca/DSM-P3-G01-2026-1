@@ -1,153 +1,87 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const Recipe = sequelize.define(
-  'Recipe',
+const recipeSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'O usuário é obrigatório']
     },
     nome: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'O nome da receita é obrigatório'
-        }
-      }
+      type: String,
+      required: [true, 'O nome da receita é obrigatório'],
+      trim: true
     },
     descricao: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: String,
+      default: null
     },
     ingredientes: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'Os ingredientes são obrigatórios'
-        }
-      },
-      get() {
-        const value = this.getDataValue('ingredientes');
+      type: mongoose.Schema.Types.Mixed, // Array ou string
+      required: [true, 'Os ingredientes são obrigatórios'],
+      get(value) {
         if (!value) return [];
+        if (Array.isArray(value)) return value;
         try {
           return JSON.parse(value);
         } catch {
           return value;
-        }
-      },
-      set(value) {
-        if (Array.isArray(value)) {
-          this.setDataValue('ingredientes', JSON.stringify(value));
-        } else {
-          this.setDataValue('ingredientes', value);
         }
       }
     },
     modo_preparo: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'O modo de preparo é obrigatório'
-        }
-      }
+      type: String,
+      required: [true, 'O modo de preparo é obrigatório']
     },
     tempo_preparo: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      default: null
     },
     rendimento: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      default: null
     },
     propriedades: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        const value = this.getDataValue('propriedades');
-        if (!value) return null;
-        try {
-          return JSON.parse(value);
-        } catch {
-          return value;
-        }
-      },
-      set(value) {
-        if (typeof value === 'object' && value !== null) {
-          this.setDataValue('propriedades', JSON.stringify(value));
-        } else {
-          this.setDataValue('propriedades', value);
-        }
-      }
+      type: mongoose.Schema.Types.Mixed,
+      default: null
     },
     restricoes_detectadas: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        const value = this.getDataValue('restricoes_detectadas');
-        if (!value) return [];
-        try {
-          return JSON.parse(value);
-        } catch {
-          return [];
-        }
-      },
-      set(value) {
-        if (Array.isArray(value)) {
-          this.setDataValue('restricoes_detectadas', JSON.stringify(value));
-        } else if (typeof value === 'string') {
-          this.setDataValue('restricoes_detectadas', value);
-        } else {
-          this.setDataValue('restricoes_detectadas', JSON.stringify([]));
-        }
-      }
+      type: [String],
+      default: []
     },
     imagem_url: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: String,
+      default: null
     },
     status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'rascunho',
-      validate: {
-        isIn: {
-          args: [['publicada', 'rascunho']],
-          msg: 'Status deve ser "publicada" ou "rascunho"'
-        }
+      type: String,
+      required: true,
+      default: 'rascunho',
+      enum: {
+        values: ['publicada', 'rascunho'],
+        message: 'Status deve ser "publicada" ou "rascunho"'
       }
     },
     visualizacoes: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-      validate: {
-        min: {
-          args: [0],
-          msg: 'Visualizações não pode ser negativo'
-        }
-      }
+      type: Number,
+      default: 0,
+      min: [0, 'Visualizações não pode ser negativo']
     }
   },
   {
-    tableName: 'recipes',
-    timestamps: true,
-    underscored: true
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: {
+      getters: true,
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      }
+    }
   }
 );
 
-module.exports = Recipe;
+const Recipe = mongoose.model('Recipe', recipeSchema);
 
+module.exports = Recipe;

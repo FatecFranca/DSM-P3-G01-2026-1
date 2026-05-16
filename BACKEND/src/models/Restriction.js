@@ -1,61 +1,35 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const Restriction = sequelize.define(
-  'Restriction',
+const restrictionSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     nome: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'O nome da restrição é obrigatório'
-        }
-      }
+      type: String,
+      required: [true, 'O nome da restrição é obrigatório'],
+      trim: true
     },
     categoria: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'A categoria é obrigatória'
-        }
-      }
+      type: String,
+      required: [true, 'A categoria é obrigatória'],
+      trim: true
     },
     palavras_chave: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        const value = this.getDataValue('palavras_chave');
-        if (!value) return [];
-        if (Array.isArray(value)) return value;
-        if (typeof value !== 'string') return [];
-        try {
-          return JSON.parse(value);
-        } catch {
-          return value.split(',').map((s) => s.trim()).filter(s => s);
-        }
-      },
-      set(value) {
-        if (Array.isArray(value)) {
-          this.setDataValue('palavras_chave', JSON.stringify(value));
-        } else {
-          this.setDataValue('palavras_chave', value);
-        }
-      }
+      type: [String],
+      default: []
     }
   },
   {
-    tableName: 'restrictions',
-    timestamps: true,
-    underscored: true
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      }
+    }
   }
 );
 
-module.exports = Restriction;
+const Restriction = mongoose.model('Restriction', restrictionSchema);
 
+module.exports = Restriction;

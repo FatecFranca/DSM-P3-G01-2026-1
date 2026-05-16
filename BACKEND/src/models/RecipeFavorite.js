@@ -1,47 +1,34 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const RecipeFavorite = sequelize.define(
-  'RecipeFavorite',
+const recipeFavoriteSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     recipe_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'recipes',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      required: true
     },
     user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     }
   },
   {
-    tableName: 'recipe_favorites',
-    timestamps: true,
-    underscored: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['recipe_id', 'user_id']
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
       }
-    ]
+    }
   }
 );
 
-module.exports = RecipeFavorite;
+// Garante que um usuário só favorita uma receita uma vez
+recipeFavoriteSchema.index({ recipe_id: 1, user_id: 1 }, { unique: true });
 
+const RecipeFavorite = mongoose.model('RecipeFavorite', recipeFavoriteSchema);
+
+module.exports = RecipeFavorite;

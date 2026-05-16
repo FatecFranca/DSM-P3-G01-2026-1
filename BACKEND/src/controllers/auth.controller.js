@@ -20,60 +20,29 @@ const logger = require('../utils/logger');
  */
 const register = async (req, res) => {
   try {
-    // Log completo do body recebido
     logger.info('Body completo recebido:', JSON.stringify(req.body));
-    logger.info('Keys do body:', Object.keys(req.body || {}));
-    
+
     const { nome_completo, email, senha, telefone, idade, tem_restricao } = req.body;
 
-    // Log para debug
-    logger.info('Campos extraídos', { 
-      nome_completo: !!nome_completo,
-      email, 
-      senha: !!senha,
-      tem_restricao, 
-      tipo: typeof tem_restricao,
-      valor_bruto: tem_restricao,
-      telefone,
-      idade
-    });
-
-    // Verificar se o email já existe
-    const existingUser = await User.findOne({ where: { email } });
-
+    // Verificar se email já existe
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: 'Este email já está cadastrado'
-      });
+      return res.status(409).json({ success: false, message: 'Este email já está cadastrado' });
     }
 
-    // Hash da senha
     const senha_hash = await hashPassword(senha);
-
-    // Gerar token de verificação de email
     const verificationToken = generateResetToken();
-    const expirationDate = generateExpirationDate(24); // Expira em 24 horas
+    const expirationDate = generateExpirationDate(24);
 
     // Converter tem_restricao para boolean
-    // Pode vir como true, 'true', 1, '1', ou false
     let temRestricaoValue = false;
     if (tem_restricao !== undefined && tem_restricao !== null) {
-      if (typeof tem_restricao === 'boolean') {
-        temRestricaoValue = tem_restricao;
-      } else if (typeof tem_restricao === 'string') {
+      if (typeof tem_restricao === 'boolean') temRestricaoValue = tem_restricao;
+      else if (typeof tem_restricao === 'string')
         temRestricaoValue = tem_restricao.toLowerCase() === 'true' || tem_restricao === '1';
-      } else if (typeof tem_restricao === 'number') {
-        temRestricaoValue = tem_restricao === 1;
-      }
+      else if (typeof tem_restricao === 'number') temRestricaoValue = tem_restricao === 1;
     }
 
-    logger.info('tem_restricao processado', { 
-      valor_original: tem_restricao,
-      valor_processado: temRestricaoValue 
-    });
-
-    // Criar usuário
     const user = await User.create({
       nome_completo,
       email,
@@ -85,34 +54,24 @@ const register = async (req, res) => {
       data_expiracao_token: expirationDate
     });
 
-    logger.info('Usuário criado', { 
-      userId: user.id, 
-      email: user.email,
-      tem_restricao: user.tem_restricao 
-    });
+    logger.info('Usuário criado', { userId: user._id, email: user.email });
 
-    // Enviar emails (não bloqueiam a resposta)
-    // Email de boas-vindas
-    sendWelcomeEmail(user.email, user.nome_completo).catch(error => {
-      logger.error('Erro ao enviar email de boas-vindas no registro', error, { userId: user.id });
-    });
+    sendWelcomeEmail(user.email, user.nome_completo).catch(err =>
+      logger.error('Erro ao enviar email de boas-vindas', err)
+    );
+    sendVerificationEmail(user.email, verificationToken).catch(err =>
+      logger.error('Erro ao enviar email de verificação', err)
+    );
 
-    // Email de verificação
-    sendVerificationEmail(user.email, verificationToken).catch(error => {
-      logger.error('Erro ao enviar email de verificação no registro', error, { userId: user.id });
-    });
+    const token = generateToken({ userId: user._id, email: user.email });
+    const refreshToken = generateRefreshToken({ userId: user._id, email: user.email });
 
-    // Gerar token JWT
-    const token = generateToken({ userId: user.id, email: user.email });
-    const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
-
-    // Retornar dados do usuário e token
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Usuário criado com sucesso',
       data: {
         user: {
-          id: user.id,
+          id: user._id,
           nome_completo: user.nome_completo,
           email: user.email,
           telefone: user.telefone,
@@ -128,29 +87,21 @@ const register = async (req, res) => {
   } catch (error) {
     logger.error('Erro no registro', error);
 
-    // Erro de validação do Sequelize
-    if (error.name === 'SequelizeValidationError') {
-      const errors = error.errors.map(err => ({
+    // Erro de validação do Mongoose
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => ({
         field: err.path,
         message: err.message
       }));
-
-      return res.status(400).json({
-        success: false,
-        message: 'Erro de validação',
-        errors
-      });
+      return res.status(400).json({ success: false, message: 'Erro de validação', errors });
     }
 
-    // Erro de constraint única (email duplicado)
-    if (error.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).json({
-        success: false,
-        message: 'Este email já está cadastrado'
-      });
+    // Índice único violado (email duplicado)
+    if (error.code === 11000) {
+      return res.status(409).json({ success: false, message: 'Este email já está cadastrado' });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao criar usuário',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -166,37 +117,27 @@ const login = async (req, res) => {
   try {
     const { email, senha } = req.body;
 
-    // Buscar usuário pelo email (incluindo senha_hash)
-    const user = await User.scope('withPassword').findOne({ where: { email } });
+    // findWithPassword inclui senha_hash (select: false no schema)
+    const user = await User.findWithPassword({ email });
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Email ou senha inválidos'
-      });
+      return res.status(401).json({ success: false, message: 'Email ou senha inválidos' });
     }
 
-    // Verificar senha
     const isPasswordValid = await comparePassword(senha, user.senha_hash);
-
     if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Email ou senha inválidos'
-      });
+      return res.status(401).json({ success: false, message: 'Email ou senha inválidos' });
     }
 
-    // Gerar token JWT
-    const token = generateToken({ userId: user.id, email: user.email });
-    const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
+    const token = generateToken({ userId: user._id, email: user.email });
+    const refreshToken = generateRefreshToken({ userId: user._id, email: user.email });
 
-    // Retornar dados do usuário e token
-    res.json({
+    return res.json({
       success: true,
       message: 'Login realizado com sucesso',
       data: {
         user: {
-          id: user.id,
+          id: user._id,
           nome_completo: user.nome_completo,
           email: user.email,
           telefone: user.telefone,
@@ -212,8 +153,7 @@ const login = async (req, res) => {
     });
   } catch (error) {
     logger.error('Erro no login', error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao fazer login',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -230,36 +170,24 @@ const refreshToken = async (req, res) => {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
-      return res.status(400).json({
-        success: false,
-        message: 'Refresh token não fornecido'
-      });
+      return res.status(400).json({ success: false, message: 'Refresh token não fornecido' });
     }
 
     const { verifyToken } = require('../utils/jwt');
     const decoded = verifyToken(refreshToken);
 
-    // Buscar usuário
-    const user = await User.findByPk(decoded.userId);
-
+    const user = await User.findById(decoded.userId);
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Usuário não encontrado'
-      });
+      return res.status(401).json({ success: false, message: 'Usuário não encontrado' });
     }
 
-    // Gerar novo token
-    const newToken = generateToken({ userId: user.id, email: user.email });
-    const newRefreshToken = generateRefreshToken({ userId: user.id, email: user.email });
+    const newToken = generateToken({ userId: user._id, email: user.email });
+    const newRefreshToken = generateRefreshToken({ userId: user._id, email: user.email });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Token renovado com sucesso',
-      data: {
-        token: newToken,
-        refreshToken: newRefreshToken
-      }
+      data: { token: newToken, refreshToken: newRefreshToken }
     });
   } catch (error) {
     return res.status(401).json({
@@ -276,48 +204,36 @@ const refreshToken = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+    const user = await User.findOne({ email });
 
-    // Buscar usuário pelo email
-    const user = await User.findOne({ where: { email } });
-
-    // Por segurança, sempre retornar sucesso mesmo se o email não existir
-    // Isso previne enumeração de emails
     if (!user) {
       return res.json({
         success: true,
-        message:
-          'Se o email estiver cadastrado, você receberá um email com instruções para recuperar sua senha'
+        message: 'Se o email estiver cadastrado, você receberá um email com instruções para recuperar sua senha'
       });
     }
 
-    // Gerar token de recuperação
     const resetToken = generateResetToken();
-    const expirationDate = generateExpirationDate(1); // Expira em 1 hora
+    const expirationDate = generateExpirationDate(1);
 
-    // Salvar token no banco de dados
-    await user.update({
+    await User.findByIdAndUpdate(user._id, {
       token_recuperacao_senha: resetToken,
       data_expiracao_token: expirationDate
     });
 
-    // Enviar email com token
     try {
       await sendPasswordResetEmail(user.email, resetToken);
     } catch (emailError) {
       logger.error('Erro ao enviar email de recuperação de senha', emailError);
-      // Não falhar a requisição se o email não for enviado
-      // Em produção, você pode querer tratar isso de forma diferente
     }
 
-    res.json({
+    return res.json({
       success: true,
-      message:
-        'Se o email estiver cadastrado, você receberá um email com instruções para recuperar sua senha'
+      message: 'Se o email estiver cadastrado, você receberá um email com instruções para recuperar sua senha'
     });
   } catch (error) {
     logger.error('Erro na solicitação de recuperação de senha', error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao processar solicitação de recuperação de senha',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -334,49 +250,33 @@ const verifyResetToken = async (req, res) => {
     const { token } = req.body;
 
     if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token não fornecido'
-      });
+      return res.status(400).json({ success: false, message: 'Token não fornecido' });
     }
 
-    // Buscar usuário pelo token
-    const user = await User.findOne({
-      where: { token_recuperacao_senha: token }
-    });
+    // Selecionar campos ocultos necessários para a verificação
+    const user = await User.findOne({ token_recuperacao_senha: token }).select(
+      '+token_recuperacao_senha +data_expiracao_token'
+    );
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token inválido'
-      });
+      return res.status(400).json({ success: false, message: 'Token inválido' });
     }
 
-    // Verificar se o token está expirado
     if (isTokenExpired(user.data_expiracao_token)) {
-      // Limpar token expirado
-      await user.update({
+      await User.findByIdAndUpdate(user._id, {
         token_recuperacao_senha: null,
         data_expiracao_token: null
       });
-
       return res.status(400).json({
         success: false,
         message: 'Token expirado. Solicite uma nova recuperação de senha'
       });
     }
 
-    res.json({
-      success: true,
-      message: 'Token válido',
-      data: {
-        email: user.email
-      }
-    });
+    return res.json({ success: true, message: 'Token válido', data: { email: user.email } });
   } catch (error) {
     logger.error('Erro na verificação de token', error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao verificar token',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -393,56 +293,40 @@ const resetPassword = async (req, res) => {
     const { token, senha } = req.body;
 
     if (!token || !senha) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token e nova senha são obrigatórios'
-      });
+      return res.status(400).json({ success: false, message: 'Token e nova senha são obrigatórios' });
     }
 
-    // Buscar usuário pelo token
-    const user = await User.scope('withPassword').findOne({
-      where: { token_recuperacao_senha: token }
-    });
+    const user = await User.findOne({ token_recuperacao_senha: token }).select(
+      '+token_recuperacao_senha +data_expiracao_token'
+    );
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token inválido'
-      });
+      return res.status(400).json({ success: false, message: 'Token inválido' });
     }
 
-    // Verificar se o token está expirado
     if (isTokenExpired(user.data_expiracao_token)) {
-      // Limpar token expirado
-      await user.update({
+      await User.findByIdAndUpdate(user._id, {
         token_recuperacao_senha: null,
         data_expiracao_token: null
       });
-
       return res.status(400).json({
         success: false,
         message: 'Token expirado. Solicite uma nova recuperação de senha'
       });
     }
 
-    // Hash da nova senha
     const senha_hash = await hashPassword(senha);
 
-    // Atualizar senha e invalidar token
-    await user.update({
+    await User.findByIdAndUpdate(user._id, {
       senha_hash,
       token_recuperacao_senha: null,
       data_expiracao_token: null
     });
 
-    res.json({
-      success: true,
-      message: 'Senha redefinida com sucesso'
-    });
+    return res.json({ success: true, message: 'Senha redefinida com sucesso' });
   } catch (error) {
     logger.error('Erro na redefinição de senha', error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao redefinir senha',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -457,54 +341,40 @@ const resetPassword = async (req, res) => {
 const sendVerificationEmailHandler = async (req, res) => {
   try {
     const { email } = req.body;
-
-    // Buscar usuário pelo email
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email });
 
     if (!user) {
-      // Por segurança, sempre retornar sucesso mesmo se o email não existir
       return res.json({
         success: true,
-        message:
-          'Se o email estiver cadastrado, você receberá um email com instruções para verificar sua conta'
+        message: 'Se o email estiver cadastrado, você receberá um email com instruções para verificar sua conta'
       });
     }
 
-    // Verificar se o email já está verificado
     if (user.email_verificado) {
-      return res.json({
-        success: true,
-        message: 'Este email já está verificado'
-      });
+      return res.json({ success: true, message: 'Este email já está verificado' });
     }
 
-    // Gerar token de verificação
     const verificationToken = generateResetToken();
-    const expirationDate = generateExpirationDate(24); // Expira em 24 horas
+    const expirationDate = generateExpirationDate(24);
 
-    // Salvar token no banco de dados
-    await user.update({
+    await User.findByIdAndUpdate(user._id, {
       token_verificacao_email: verificationToken,
       data_expiracao_token: expirationDate
     });
 
-    // Enviar email com token
     try {
       await sendVerificationEmail(user.email, verificationToken);
     } catch (emailError) {
-      logger.error('Erro ao enviar email de recuperação de senha', emailError);
-      // Não falhar a requisição se o email não for enviado
+      logger.error('Erro ao enviar email de verificação', emailError);
     }
 
-    res.json({
+    return res.json({
       success: true,
-      message:
-        'Se o email estiver cadastrado, você receberá um email com instruções para verificar sua conta'
+      message: 'Se o email estiver cadastrado, você receberá um email com instruções para verificar sua conta'
     });
   } catch (error) {
     logger.error('Erro no envio de email de verificação', error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao enviar email de verificação',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -521,71 +391,50 @@ const verifyEmail = async (req, res) => {
     const { token } = req.body;
 
     if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token não fornecido'
-      });
+      return res.status(400).json({ success: false, message: 'Token não fornecido' });
     }
 
-    // Buscar usuário pelo token de verificação
-    const user = await User.findOne({
-      where: { token_verificacao_email: token }
-    });
+    const user = await User.findOne({ token_verificacao_email: token }).select(
+      '+token_verificacao_email +data_expiracao_token'
+    );
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Token inválido'
-      });
+      return res.status(400).json({ success: false, message: 'Token inválido' });
     }
 
-    // Verificar se o email já está verificado
     if (user.email_verificado) {
-      // Limpar token mesmo se já estiver verificado
-      await user.update({
+      await User.findByIdAndUpdate(user._id, {
         token_verificacao_email: null,
         data_expiracao_token: null
       });
-
-      return res.json({
-        success: true,
-        message: 'Este email já estava verificado'
-      });
+      return res.json({ success: true, message: 'Este email já estava verificado' });
     }
 
-    // Verificar se o token está expirado
     if (isTokenExpired(user.data_expiracao_token)) {
-      // Limpar token expirado
-      await user.update({
+      await User.findByIdAndUpdate(user._id, {
         token_verificacao_email: null,
         data_expiracao_token: null
       });
-
       return res.status(400).json({
         success: false,
         message: 'Token expirado. Solicite um novo email de verificação'
       });
     }
 
-    // Marcar email como verificado e limpar token
-    await user.update({
+    await User.findByIdAndUpdate(user._id, {
       email_verificado: true,
       token_verificacao_email: null,
       data_expiracao_token: null
     });
 
-    res.json({
+    return res.json({
       success: true,
       message: 'Email verificado com sucesso',
-      data: {
-        email: user.email,
-        email_verificado: true
-      }
+      data: { email: user.email, email_verificado: true }
     });
   } catch (error) {
     logger.error('Erro na verificação de email', error);
-
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Erro ao verificar email',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -593,24 +442,26 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+/**
+ * Logout
+ * POST /api/auth/logout
+ */
 const logout = async (req, res) => {
   try {
-    // Pega token do header Authorization
     const authHeader = req.headers.authorization;
-    if (!authHeader)
+    if (!authHeader) {
       return res.status(400).json({ success: false, message: 'Token não fornecido' });
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer')
-      return res.status(400).json({ success: false, message: 'Formato inválido' });
-    const token = parts[1];
+    }
 
-    // calcula expiração (opcional: decode para pegar exp)
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+      return res.status(400).json({ success: false, message: 'Formato inválido' });
+    }
+
+    const token = parts[1];
     const jwt = require('jsonwebtoken');
     const decoded = jwt.decode(token);
-    let expiresAt = null;
-    if (decoded && decoded.exp) {
-      expiresAt = new Date(decoded.exp * 1000);
-    }
+    const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000) : null;
 
     await BlacklistedToken.create({
       token_hash: require('crypto').createHash('sha256').update(token).digest('hex'),

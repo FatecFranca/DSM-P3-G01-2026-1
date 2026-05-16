@@ -1,65 +1,44 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const RecipeRating = sequelize.define(
-  'RecipeRating',
+const recipeRatingSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     recipe_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'recipes',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Recipe',
+      required: true
     },
     user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
     rating: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        min: {
-          args: [1],
-          msg: 'A avaliação deve ser no mínimo 1'
-        },
-        max: {
-          args: [5],
-          msg: 'A avaliação deve ser no máximo 5'
-        }
-      }
+      type: Number,
+      required: [true, 'A avaliação é obrigatória'],
+      min: [1, 'A avaliação deve ser no mínimo 1'],
+      max: [5, 'A avaliação deve ser no máximo 5']
     },
     comentario: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: String,
+      default: null
     }
   },
   {
-    tableName: 'recipe_ratings',
-    timestamps: true,
-    underscored: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['recipe_id', 'user_id']
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
       }
-    ]
+    }
   }
 );
 
-module.exports = RecipeRating;
+// Garante que um usuário só avalia uma receita uma vez (equivale ao unique index do Sequelize)
+recipeRatingSchema.index({ recipe_id: 1, user_id: 1 }, { unique: true });
 
+const RecipeRating = mongoose.model('RecipeRating', recipeRatingSchema);
+
+module.exports = RecipeRating;

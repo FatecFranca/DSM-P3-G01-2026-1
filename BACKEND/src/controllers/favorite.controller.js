@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const RecipeFavorite = require('../models/RecipeFavorite');
 const Recipe = require('../models/Recipe');
 const logger = require('../utils/logger');
@@ -11,32 +12,21 @@ const addFavorite = async (req, res) => {
     const userId = req.user.id;
     const recipeId = req.params.id;
 
-    // Verificar se receita existe
-    const recipe = await Recipe.findByPk(recipeId);
+    if (!mongoose.isValidObjectId(recipeId)) {
+      return res.status(400).json({ success: false, message: 'ID da receita inválido' });
+    }
+
+    const recipe = await Recipe.findById(recipeId);
     if (!recipe) {
-      return res.status(404).json({
-        success: false,
-        message: 'Receita não encontrada'
-      });
+      return res.status(404).json({ success: false, message: 'Receita não encontrada' });
     }
 
-    // Verificar se já está nos favoritos
-    const existing = await RecipeFavorite.findOne({
-      where: { user_id: userId, recipe_id: recipeId }
-    });
-
+    const existing = await RecipeFavorite.findOne({ user_id: userId, recipe_id: recipeId });
     if (existing) {
-      return res.status(409).json({
-        success: false,
-        message: 'Receita já está nos favoritos'
-      });
+      return res.status(409).json({ success: false, message: 'Receita já está nos favoritos' });
     }
 
-    // Adicionar aos favoritos
-    const favorite = await RecipeFavorite.create({
-      user_id: userId,
-      recipe_id: recipeId
-    });
+    const favorite = await RecipeFavorite.create({ user_id: userId, recipe_id: recipeId });
 
     return res.status(201).json({
       success: true,
@@ -44,11 +34,8 @@ const addFavorite = async (req, res) => {
       data: favorite
     });
   } catch (error) {
-    logger.error('Erro ao adicionar favorito', error, { userId, recipeId });
-    return res.status(500).json({
-      success: false,
-      message: 'Erro ao adicionar favorito'
-    });
+    logger.error('Erro ao adicionar favorito', error);
+    return res.status(500).json({ success: false, message: 'Erro ao adicionar favorito' });
   }
 };
 
@@ -61,31 +48,17 @@ const removeFavorite = async (req, res) => {
     const userId = req.user.id;
     const recipeId = req.params.id;
 
-    // Verificar se está nos favoritos
-    const favorite = await RecipeFavorite.findOne({
-      where: { user_id: userId, recipe_id: recipeId }
-    });
-
+    const favorite = await RecipeFavorite.findOne({ user_id: userId, recipe_id: recipeId });
     if (!favorite) {
-      return res.status(404).json({
-        success: false,
-        message: 'Receita não está nos favoritos'
-      });
+      return res.status(404).json({ success: false, message: 'Receita não está nos favoritos' });
     }
 
-    // Remover dos favoritos
-    await favorite.destroy();
+    await RecipeFavorite.findByIdAndDelete(favorite._id);
 
-    return res.status(200).json({
-      success: true,
-      message: 'Receita removida dos favoritos'
-    });
+    return res.json({ success: true, message: 'Receita removida dos favoritos' });
   } catch (error) {
-    logger.error('Erro ao remover favorito', error, { userId, recipeId });
-    return res.status(500).json({
-      success: false,
-      message: 'Erro ao remover favorito'
-    });
+    logger.error('Erro ao remover favorito', error);
+    return res.status(500).json({ success: false, message: 'Erro ao remover favorito' });
   }
 };
 
@@ -97,31 +70,23 @@ const listFavorites = async (req, res) => {
   try {
     const userId = req.user.id;
     const { page = 1, limit = 20 } = req.query;
-    const offset = (page - 1) * limit;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const { count, rows } = await RecipeFavorite.findAndCountAll({
-      where: { user_id: userId },
-      include: [
-        {
-          model: Recipe,
-          as: 'recipe',
-          include: [
-            {
-              model: require('../models/User'),
-              as: 'author',
-              attributes: ['id', 'nome_completo', 'foto_perfil']
-            }
-          ]
-        }
-      ],
-      limit: parseInt(limit, 10),
-      offset: parseInt(offset, 10),
-      order: [['created_at', 'DESC']]
-    });
+    const [total, rows] = await Promise.all([
+      RecipeFavorite.countDocuments({ user_id: userId }),
+      RecipeFavorite.find({ user_id: userId })
+        .populate({
+          path: 'recipe_id',
+          populate: { path: 'user_id', select: 'id nome_completo foto_perfil' }
+        })
+        .sort({ created_at: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+    ]);
 
     const favorites = rows.map(fav => ({
-      id: fav.id,
-      recipe: fav.recipe,
+      id: fav._id,
+      recipe: fav.recipe_id,
       added_at: fav.created_at
     }));
 
@@ -130,19 +95,16 @@ const listFavorites = async (req, res) => {
       data: {
         favorites,
         pagination: {
-          page: parseInt(page, 10),
-          limit: parseInt(limit, 10),
-          total: count,
-          totalPages: Math.ceil(count / limit)
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / parseInt(limit))
         }
       }
     });
   } catch (error) {
-    logger.error('Erro ao listar favoritos', error, { userId });
-    return res.status(500).json({
-      success: false,
-      message: 'Erro ao listar favoritos'
-    });
+    logger.error('Erro ao listar favoritos', error);
+    return res.status(500).json({ success: false, message: 'Erro ao listar favoritos' });
   }
 };
 
@@ -155,30 +117,19 @@ const checkFavorite = async (req, res) => {
     const userId = req.user.id;
     const recipeId = req.params.id;
 
-    const favorite = await RecipeFavorite.findOne({
-      where: { user_id: userId, recipe_id: recipeId }
-    });
+    const favorite = await RecipeFavorite.findOne({ user_id: userId, recipe_id: recipeId });
 
     return res.json({
       success: true,
       data: {
         isFavorite: !!favorite,
-        favoriteId: favorite?.id || null
+        favoriteId: favorite?._id || null
       }
     });
   } catch (error) {
-    logger.error('Erro ao verificar favorito', error, { userId, recipeId });
-    return res.status(500).json({
-      success: false,
-      message: 'Erro ao verificar favorito'
-    });
+    logger.error('Erro ao verificar favorito', error);
+    return res.status(500).json({ success: false, message: 'Erro ao verificar favorito' });
   }
 };
 
-module.exports = {
-  addFavorite,
-  removeFavorite,
-  listFavorites,
-  checkFavorite
-};
-
+module.exports = { addFavorite, removeFavorite, listFavorites, checkFavorite };

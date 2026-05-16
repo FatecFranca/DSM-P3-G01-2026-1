@@ -1,69 +1,38 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const mongoose = require('mongoose');
 
-const UserRestriction = sequelize.define(
-  'UserRestriction',
+const userRestrictionSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'users',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
     restriction_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'restrictions',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE'
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Restriction',
+      required: true
     },
     palavras_chave_personalizadas: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        const value = this.getDataValue('palavras_chave_personalizadas');
-        if (!value) return [];
-        try {
-          return JSON.parse(value);
-        } catch {
-          return value.split(',').map((s) => s.trim());
-        }
-      },
-      set(value) {
-        if (Array.isArray(value)) {
-          this.setDataValue('palavras_chave_personalizadas', JSON.stringify(value));
-        } else {
-          this.setDataValue('palavras_chave_personalizadas', value);
-        }
-      }
+      type: [String],
+      default: []
     }
   },
   {
-    tableName: 'user_restrictions',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: false, // A tabela não tem updated_at
-    underscored: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ['user_id', 'restriction_id']
+    timestamps: { createdAt: 'created_at', updatedAt: false },
+    toJSON: {
+      transform(doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
       }
-    ]
+    }
   }
 );
 
-module.exports = UserRestriction;
+// Garante que um usuário não tenha a mesma restrição duplicada
+userRestrictionSchema.index({ user_id: 1, restriction_id: 1 }, { unique: true });
 
+const UserRestriction = mongoose.model('UserRestriction', userRestrictionSchema);
+
+module.exports = UserRestriction;
