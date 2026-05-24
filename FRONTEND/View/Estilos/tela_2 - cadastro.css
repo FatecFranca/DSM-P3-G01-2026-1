@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -9,133 +13,146 @@ a:focus {
   opacity: 0.8;
 }
 
-img {
-  width: 70px;
-}
-
 body {
   margin: 0;
-  font-family: 'Poppins', 'Courier New', monospace;
-  background-image: url(../Images/Imagem1.jpg);
+  min-height: 100vh;
+  font-family: 'Poppins', Arial, sans-serif;
+  background:
+    linear-gradient(rgba(255,255,255,.08), rgba(255,255,255,.08)),
+    url(../Images/Imagem1.jpg);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(3px);
+  padding: 40px 20px;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  z-index: -1;
+}
+
+img {
+  width: 74px;
+  margin-bottom: 18px;
+}
 
 .form-container {
-  width: 420px;
-  padding: 40px 30px;
-    background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 20px;
+  width: 430px;
+  padding: 42px 34px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 18px;
   text-align: center;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(6px);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
   animation: fadeIn 0.8s ease-in-out;
 }
 
 .form-container h2 {
-  margin-bottom: 25px;
-  font-size: 1.8em;
-  color: #333;
-  letter-spacing: 1px;
+  margin: 0 0 24px;
+  font-size: 1.9rem;
+  color: #242424;
+  font-weight: 800;
 }
 
 .input-group {
   position: relative;
-  margin: 15px auto;
-  width: 85%;
+  width: 100%;
+  margin: 14px 0;
 }
 
 .input-group i {
   position: absolute;
-  left: 12px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
   color: #999;
+  font-size: 14px;
 }
 
 .input-group input {
   width: 100%;
-  padding: 12px 0px 12px 40px; 
-  border: none;
-  border-radius: 10px;
-  background-color: #f8f8f8;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
-  font-size: 1em;
-  transition: all 0.3s ease;
+  padding: 14px 14px 14px 44px;
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  background: #fff;
+  color: #222;
+  font-size: 0.95rem;
+  transition: 0.25s ease;
 }
 
 .input-group input:focus {
   outline: none;
-  box-shadow: 0 0 8px rgb(255, 123, 0);
-  background-color: #fff;
+  border-color: #ff8a00;
+  box-shadow: 0 0 0 4px rgba(255, 138, 0, 0.15);
 }
-
 
 .check-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.95em;
-  margin: 15px 0;
-  color: #444;
-  gap: 8px;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 10px;
+  margin: 18px 0;
+  font-size: 0.9rem;
+  color: #4b4b4b;
 }
 
 .check-label input[type="checkbox"] {
-  accent-color: #2ecc71;
+  accent-color: #ff8a00;
 }
-
 
 .btn-grad {
-  background-image: linear-gradient(to right, #FF512F 0%, #F09819 51%, #FF512F 100%);
-  margin: 15px auto 5px;
-  padding: 14px 45px;
-  text-align: center;
-  transition: 0.5s;
-  background-size: 200% auto;
-  color: white;
-  font-weight: bold;
+  width: 100%;
+  background-image: linear-gradient(135deg, #ff512f 0%, #f09819 50%, #ffb347 100%);
+  padding: 15px;
+  margin-top: 6px;
+  color: #fff;
+  font-weight: 800;
   border: none;
-  box-shadow: 0 5px 15px rgba(255, 145, 0, 0.3);
-  font-size: 17px;
-  border-radius: 15px;
-  display: inline-block;
+  border-radius: 12px;
+  font-size: 1rem;
   cursor: pointer;
-}
-
-.btn-grad:hover {
-  background-position: right center;
-  transform: translateY(-2px);
-}
-
-
-.btn-voltar {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background-image: linear-gradient(to right, #FF512F 0%, #F09819 51%, #FF512F 100%);
-  padding: 10px 15px;
-  border-radius: 15px;
-  color: black;
-  font-weight: bold;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px rgba(255, 111, 0, 0.35);
   transition: 0.3s ease;
 }
 
-.btn-voltar:hover {
-  background-position: right center;
-  transform: scale(1.05);
+.btn-grad:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 111, 0, 0.45);
 }
 
+.btn-voltar {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  background: #fff;
+  padding: 11px 18px;
+  border-radius: 999px;
+  color: #222;
+  font-weight: 700;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+}
+
+.btn-voltar:hover {
+  background: #ff8a00;
+  color: #fff;
+  opacity: 1;
+}
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-15px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
