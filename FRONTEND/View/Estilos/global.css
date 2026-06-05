@@ -108,8 +108,9 @@ body {
 }
 
 .safe-bite img {
-    width: min(16.875rem, 90vw); 
-    height: min(5rem, 15vw); 
+    width: min(10rem, 35vw);
+    height: auto;
+    max-height: 6rem;
     object-fit: contain;
 }
 
@@ -348,7 +349,7 @@ body.menu-open .text {
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 7.5rem; 
+    --header-height: 10rem;
         --menu-width: 13.75rem; 
     }
     
