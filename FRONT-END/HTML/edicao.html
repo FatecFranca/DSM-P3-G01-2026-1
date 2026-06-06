@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Receita</title>
+    <link rel="shortcut icon" href="../Images/favicon.ico" type="image/x-icon"><link rel="stylesheet" href="../CSS/global.css">
+    <link rel="stylesheet" href="../CSS/edicao.css">
+</head>
+<body>
+     <!-- SIDEBAR -->
+     <aside class="sidebar">
+        <div class="logo">
+            <img src="../Images/logo.png" alt="Logo do Site">
+            <span class="logo-text">SafeBite</span>
+        </div>
+        <nav>
+            <a class="nav-item active" href="receitas.html">
+            <span class="icon">📖</span> Receitas
+            </a>
+            <a class="nav-item active2" href="pesquisa.html">
+            <span class="icon">🔍</span> Pesquisa
+            </a>
+            <a class="nav-item active3" href="publicacao.html">
+            <span class="icon">📰</span> Publicações
+            </a>
+            <a class="nav-item active4" href="perfil.html">
+            <span class="icon">👤</span> Perfil
+            </a>
+            <a class="nav-item" href="#">
+            <span class="icon">💬</span> Suporte
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="#">
+            <span class="icon">⚙️</span> Configurações
+            </a>
+            <a class="nav-item" href="../../FRONTEND/View/Index/autenticacao/tela_1 - inicial.html">
+            <span class="icon">↪️</span> Sair
+            </a>
+        </div>
+    </aside>
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Buscar receitas seguras..." id="searchInput">
+            </div>
+            <div class="topbar-right">
+            <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+            <div class="user-chip">
+                <div class="avatar">AS</div>
+                <div class="user-info">
+                <div class="user-name">Ana Silva</div>
+                <div class="user-diet">Sem Glúten</div>
+                </div>
+            </div>
+            </div>
+        </header>
+
+        <div class="page-header">
+        <div>
+        <h1>Editar Receita</h1>
+        <p>Atualize os detalhes da sua publicação segura.</p>
+        </div>
+        <div class="header-actions">
+        <button class="btn-discard" onclick="handleDiscard()">⊗ Descartar</button>
+        <button class="btn-save" onclick="handleSave()">💾 Salvar Alterações</button>
+        </div>
+  </div>
+  <div class="form-body">
+
+    <!-- 1. INFORMAÇÕES GERAIS -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">📋</div>
+        <div>
+          <div class="section-title-text">Informações Gerais</div>
+          <div class="section-sub">Dados básicos de identificação da sua receita.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Título da Receita</label>
+          <input type="text" id="recipeTitle" value="Bolo de Amêndoas e Laranja (Vegano)">
+        </div>
+        <div class="field">
+          <label>Breve Descrição</label>
+          <textarea id="recipeDesc" rows="3">Um bolo úmido, aromático e totalmente livre de ingredientes de origem animal ou glúten. Perfeito para o café da tarde.</textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Tempo de Preparo</label>
+            <div class="input-with-icon">
+              <span class="icon-left">⏱</span>
+              <input type="text" id="recipeTime" value="45 minutos">
+            </div>
+          </div>
+          <div class="field">
+            <label>Rendimento</label>
+            <div class="input-with-icon">
+              <span class="icon-left">🍽</span>
+              <input type="text" id="recipePortions" value="8 fatias">
+            </div>
+          </div>
+          <div class="field">
+            <label>Dificuldade</label>
+            <select id="recipeDiff">
+              <option>Fácil</option>
+              <option selected="">Média</option>
+              <option>Difícil</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. IMAGEM DE CAPA -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🖼</div>
+        <div>
+          <div class="section-title-text">Imagem de Capa</div>
+          <div class="section-sub">Uma imagem bonita atrai mais visualizações.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="cover-wrap">
+          <img class="cover-img" id="coverImg" src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&amp;q=80" alt="Capa da receita">
+          <div class="cover-overlay">📷 Alterar foto</div>
+          <input type="file" accept="image/*" onchange="handleCover(event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. INGREDIENTES -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">+</div>
+        <div>
+          <div class="section-title-text">Ingredientes</div>
+          <div class="section-sub">Liste todos os componentes com atenção às restrições.</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <!-- Alerta de segurança -->
+        <div class="security-alert">
+          <span class="icon">⚠️</span>
+          <div>
+            <div class="security-alert-title">Verificação de Segurança</div>
+            <div class="security-alert-desc">Identificamos que você marcou esta receita como "Sem Glúten". Certifique-se de que o fermento químico utilizado seja certificado.</div>
+          </div>
+        </div>
+
+        <!-- Tabela de ingredientes -->
+        <table class="ing-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>INGREDIENTE</th>
+              <th>QUANTIDADE</th>
+              <th style="text-align:right">AÇÃO</th>
+            </tr>
+          </thead>
+          <tbody id="ingBody">
+            <tr>
+              <td>⠿</td>
+              <td><input type="text" value="Farinha de Amêndoas"></td>
+              <td><input type="text" value="2 xícaras"></td>
+              <td style="text-align:right"><button class="delete-btn" onclick="removeIng(this)">🗑</button></td>
+            </tr>
+            <tr>
+              <td>⠿</td>
+              <td><input type="text" value="Açúcar de Coco"></td>
+              <td><input type="text" value="1/2 xícara"></td>
+              <td style="text-align:right"><button class="delete-btn" onclick="removeIng(this)">🗑</button></td>
+            </tr>
+            <tr>
+              <td>⠿</td>
+              <td><input type="text" value="Leite de Amêndoas"></td>
+              <td><input type="text" value="200ml"></td>
+              <td style="text-align:right"><button class="delete-btn" onclick="removeIng(this)">🗑</button></td>
+            </tr>
+            <tr>
+              <td>⠿</td>
+              <td><input type="text" value="Ovos de Linhaça"></td>
+              <td><input type="text" value="2 unidades"></td>
+              <td style="text-align:right"><button class="delete-btn" onclick="removeIng(this)">🗑</button></td>
+            </tr>
+            <tr>
+              <td>⠿</td>
+              <td><input type="text" value="Fermento Químico"></td>
+              <td><input type="text" value="1 colher de sopa"></td>
+              <td style="text-align:right"><button class="delete-btn" onclick="removeIng(this)">🗑</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="add-row-btn" onclick="addIngredient()">+ Adicionar Ingrediente</button>
+      </div>
+    </div>
+
+    <!-- 4. MODO DE PREPARO -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">👨‍🍳</div>
+        <div>
+          <div class="section-title-text">Modo de Preparo</div>
+          <div class="section-sub">Explique o passo a passo de forma clara.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="steps-list" id="stepsList">
+          <div class="step-row">
+            <div class="step-num">1</div>
+            <textarea>Pré-aqueça o forno a 180°C e unte uma forma média.</textarea>
+            <button class="delete-btn" onclick="removeStep(this)" style="margin-top:4px">🗑</button>
+          </div>
+          <div class="step-row">
+            <div class="step-num">2</div>
+            <textarea>Em uma tigela grande, misture a farinha de amêndoas, o açúcar de coco e o fermento.</textarea>
+            <button class="delete-btn" onclick="removeStep(this)" style="margin-top:4px">🗑</button>
+          </div>
+          <div class="step-row">
+            <div class="step-num">3</div>
+            <textarea>Adicione os ingredientes líquidos e misture até obter uma massa homogênea.</textarea>
+            <button class="delete-btn" onclick="removeStep(this)" style="margin-top:4px">🗑</button>
+          </div>
+          <div class="step-row">
+            <div class="step-num">4</div>
+            <textarea>Despeje na forma e asse por aproximadamente 35 minutos ou até dourar.</textarea>
+            <button class="delete-btn" onclick="removeStep(this)" style="margin-top:4px">🗑</button>
+          </div>
+        </div>
+        <button class="add-step-btn" onclick="addStep()" style="margin-top:14px">+ Novo Passo</button>
+      </div>
+    </div>
+
+    <!-- 5. TAGS E VISIBILIDADE -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-icon">🏷</div>
+        <div>
+          <div class="section-title-text">Tags e Visibilidade</div>
+          <div class="section-sub">Ajude outros usuários a encontrar sua receita.</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Restrições Atendidas (Tags)</label>
+          <div class="tags-wrap" id="tagsWrap">
+            <span class="tag-chip active-tag" onclick="toggleTag(this)">Sem Glúten</span>
+            <span class="tag-chip active-tag" onclick="toggleTag(this)">Vegano</span>
+            <span class="tag-chip active-tag" onclick="toggleTag(this)">Sem Lactose</span>
+            <span class="tag-chip inactive-tag" onclick="toggleTag(this)">Sem Ovos</span>
+            <span class="tag-chip inactive-tag" onclick="toggleTag(this)">Sem Soja</span>
+            <span class="tag-chip inactive-tag" onclick="toggleTag(this)">Sem Açúcar</span>
+            <span class="tag-chip inactive-tag" onclick="toggleTag(this)">Low Carb</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configurações Avançadas -->
+      <div class="advanced-toggle" id="advToggle" onclick="toggleAdvanced()">
+        Configurações Avançadas
+        <span class="arrow">▾</span>
+      </div>
+      <div class="advanced-body" id="advBody">
+        <div class="field-row">
+          <div class="field">
+            <label>Visibilidade</label>
+            <select>
+              <option>Público</option>
+              <option>Privado</option>
+              <option>Apenas Seguidores</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Categoria</label>
+            <select>
+              <option>Sobremesa</option>
+              <option>Almoço</option>
+              <option>Café da Manhã</option>
+              <option>Jantar</option>
+              <option>Lanche</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Notas Adicionais</label>
+          <textarea rows="2" placeholder="Informações extras para os leitores..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+        <button class="btn-cancel-footer" onclick="showToast('Alterações descartadas.')">Cancelar e Sair</button>
+        <button class="btn-save-footer" onclick="handleSave()">💾 Salvar Alterações</button>
+  </div>
+
+  <footer>
+    <span>© 2026 SafeBite. Todos os direitos reservados.</span>
+    <div class="footer-links">
+      <a href="#">Privacidade</a>
+      <a href="#">Termos</a>
+      <a href="#">Suporte</a>
+    </div>
+  </footer>
+  </div>
+  <script src="../JS/edicao.js"></script>
+</body>
+</html>

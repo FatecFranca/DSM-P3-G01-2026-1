@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBite - Criar Receita</title>
+     <link rel="shortcut icon" href="../Images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../CSS/criacao.css">
+    <link rel="stylesheet" href="../CSS/global.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+     <aside class="sidebar">
+        <div class="logo">
+            <img src="../Images/logo.png" alt="Logo do Site">
+            <span class="logo-text">SafeBite</span>
+        </div>
+        <nav>
+            <a class="nav-item active" href="receitas.html">
+            <span class="icon">📖</span> Receitas
+            </a>
+            <a class="nav-item active2" href="pesquisa.html">
+            <span class="icon">🔍</span> Pesquisa
+            </a>
+            <a class="nav-item active3" href="publicacao.html">
+            <span class="icon">📰</span> Publicações
+            </a>
+            <a class="nav-item active4" href="perfil.html">
+            <span class="icon">👤</span> Perfil
+            </a>
+            <a class="nav-item" href="#">
+            <span class="icon">💬</span> Suporte
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="#">
+            <span class="icon">⚙️</span> Configurações
+            </a>
+            <a class="nav-item" href="../../FRONTEND/View/Index/autenticacao/tela_1 - inicial.html">
+            <span class="icon">↪️</span> Sair
+            </a>
+        </div>
+    </aside>
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Buscar receitas seguras..." id="searchInput">
+            </div>
+            <div class="topbar-right">
+            <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+            <div class="user-chip">
+                <div class="avatar">AS</div>
+                <div class="user-info">
+                <div class="user-name">Ana Silva</div>
+                <div class="user-diet">Sem Glúten</div>
+                </div>
+            </div>
+            </div>
+        </header>
+
+          <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Criar Nova Receita</h1>
+      <p>Compartilhe suas criações seguras com a comunidade SafeBite.</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-cancel" onclick="showToast('Rascunho salvo!')">Cancelar</button>
+      <button class="btn-publish" onclick="handlePublish()">Publicar Receita →</button>
+    </div>
+  </div>
+
+  <!-- FORM LAYOUT -->
+  <div class="form-layout">
+    <div class="form-col">
+
+      <!-- 1. INFORMAÇÕES BÁSICAS -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <span class="section-title-text">Informações Básicas</span>
+        </div>
+        <div class="section-body">
+          <div class="field">
+            <label>Nome da Receita</label>
+            <input type="text" id="recipeTitle" placeholder="Ex: Panquecas de Aveia Sem Glúten" oninput="updatePreview()">
+          </div>
+          <div class="field">
+            <label>Descrição Curta</label>
+            <textarea id="recipeDesc" rows="3" placeholder="Uma breve introdução sobre o sabor e a textura..." oninput="updatePreview()"></textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Tempo de Preparo (min)</label>
+              <div class="input-icon">
+                <span class="icon-prefix">⏱</span>
+                <input type="number" id="recipeTime" min="1" value="30" style="padding-left:34px" oninput="updatePreview()">
+              </div>
+            </div>
+            <div class="field">
+              <label>Rendimento (Porções)</label>
+              <div class="input-icon">
+                <span class="icon-prefix">🍽</span>
+                <input type="number" id="recipePortions" min="1" value="2" style="padding-left:34px" oninput="updatePreview()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. MÍDIA E CATEGORIAS -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <span class="section-title-text">Mídia e Categorias</span>
+        </div>
+        <div class="section-body">
+          <div class="upload-area" id="uploadArea">
+            <input type="file" accept="image/*" id="imageInput" onchange="handleImageUpload(event)">
+            <div class="upload-icon">+</div>
+            <div class="upload-text">Clique para enviar uma foto</div>
+            <div class="upload-sub">Formatos suportados: JPG, PNG (Max 5MB)</div>
+            <img id="uploadPreview" class="upload-preview" alt="Preview">
+          </div>
+          <div class="field">
+            <label>Tags de Dieta</label>
+            <div class="diet-tags" id="dietTags">
+              <span class="diet-tag" onclick="toggleTag(this)">Vegano</span>
+              <span class="diet-tag" onclick="toggleTag(this)">Vegetariano</span>
+              <span class="diet-tag" onclick="toggleTag(this)">Sem Glúten</span>
+              <span class="diet-tag" onclick="toggleTag(this)">Sem Lactose</span>
+              <span class="diet-tag" onclick="toggleTag(this)">Low Carb</span>
+              <span class="diet-tag" onclick="toggleTag(this)">Keto</span>
+              <span class="diet-tag" onclick="toggleTag(this)">Sem Açúcar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. INGREDIENTES -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <div class="section-header-flex">
+            <span class="section-title-text">Ingredientes</span>
+            <button class="add-btn" onclick="addIngredient()">+ Adicionar</button>
+          </div>
+        </div>
+        <div class="section-body" id="ingredientsList">
+          <div class="field" style="margin-bottom:4px">
+            <label>Ingrediente</label>
+          </div>
+        <div class="ingredient-row" id="ing-1">
+    <input type="text" placeholder="Ex: 200g de Farinha de Arroz">
+    <label class="allergen-check">
+      <input type="checkbox"> <span>⚠ Alergênico?</span>
+    </label>
+    <button class="remove-btn" onclick="removeRow('ing-1')">🗑</button>
+  </div></div>
+      </div>
+
+      <!-- 4. MODO DE PREPARO -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <div class="section-header-flex">
+            <span class="section-title-text">Modo de Preparo</span>
+            <button class="add-btn" onclick="addStep()">+ Novo Passo</button>
+          </div>
+        </div>
+        <div class="section-body" id="stepsList"><div class="step-row" id="step-1">
+    <div class="step-badge">1</div>
+    <textarea placeholder="Descreva o que fazer neste estágio..."></textarea>
+    <button class="remove-btn" onclick="removeRow('step-1')" style="margin-top:4px">🗑</button>
+  </div></div>
+      </div>
+
+      <!-- 5. VISIBILIDADE -->
+      <div class="section-card">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <span class="section-title-text">Visibilidade e Publicação</span>
+        </div>
+        <div class="section-body">
+          <div class="visibility-options">
+            <label class="vis-option selected" id="visPublic">
+              <input type="radio" name="visibility" value="public" checked="" onchange="selectVis('public')">
+              <span class="vis-icon">🌐</span>
+              <div>
+                <div class="vis-label">Público</div>
+                <div class="vis-sub">Todos os usuários podem ver e salvar sua receita.</div>
+              </div>
+              <div class="vis-indicator"></div>
+            </label>
+            <label class="vis-option" id="visPrivate">
+              <input type="radio" name="visibility" value="private" onchange="selectVis('private')">
+              <span class="vis-icon">🔒</span>
+              <div>
+                <div class="vis-label">Privado</div>
+                <div class="vis-sub">Apenas você pode ver a receita no seu perfil.</div>
+              </div>
+              <div class="vis-indicator"></div>
+            </label>
+          </div>
+          <label class="confirm-check">
+            <input type="checkbox" id="confirmCheck">
+            Confirmo que esta receita foi testada e as informações de alérgenos estão corretas.
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-col">
+      <div class="preview-label">👁 VISUALIZAÇÃO EM TEMPO REAL</div>
+
+      <div class="preview-card">
+        <div class="preview-img" id="previewImgBox">
+          <img id="previewImg" alt="">
+          <div class="preview-img-placeholder" id="previewPlaceholder">🍽</div>
+          <span style="font-size:11px;color:var(--muted)" id="previewPlaceholderText">Adicione uma foto</span>
+        </div>
+        <div class="preview-tags" id="previewTags">
+          <span class="preview-tag safe">Seguro</span>
+          <span class="preview-tag" id="previewTagGluten" style="display:none">Sem Glúten</span>
+        </div>
+        <div class="preview-body">
+          <div class="preview-title placeholder" id="previewTitle">Título da Receita</div>
+          <div class="preview-meta" id="previewMeta">⏱ 30 min · 🍽 2 porções</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5" id="previewDesc">Sua descrição aparecerá aqui. Conte aos usuários o que torna esta receita especial e segura para fazer.</div>
+        </div>
+        <div class="preview-author">
+          <div class="preview-author-avatar">AS</div>
+          <span>Ana Silva · Especialista em Culinária</span>
+          <a href="#">Ver detalhes</a>
+        </div>
+      </div>
+
+      <div class="security-note">
+        <strong>🛡 Dica de Segurança</strong>
+        Receitas com ingredientes marcados como alérgenos comuns (leite, ovos, amendoim) serão automaticamente revisadas com base nas restrições dos seus leitores.
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER ACTIONS -->
+  <div class="form-footer">
+    <button class="btn-discard" onclick="handleDiscard()">Descartar Rascunho</button>
+    <button class="btn-save" onclick="handlePublish()">Salvar e Publicar 🚀</button>
+  </div>
+    </div>
+
+    <script src="../JS/criacao.js"></script>
+
+</body>
+</html>
