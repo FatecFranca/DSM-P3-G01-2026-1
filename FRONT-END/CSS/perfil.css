@@ -1,0 +1,343 @@
+.nav-item.active4 {
+    background: var(--border);
+    color: var(--text);
+  }
+
+  /* ── PAGE CONTENT ── */
+  .page-content { padding: 32px 40px; flex: 1; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  /* ── PAGE HERO ── */
+  .page-hero {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 16px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+
+  .page-hero h1 {
+    font-size: 26px; font-weight: 900;
+    color: var(--text); margin-bottom: 6px; line-height: 1.2;
+  }
+
+  .page-hero p {
+    font-size: 13px; color: var(--muted);
+    line-height: 1.6; max-width: 480px;
+  }
+
+  .btn-new-profile {
+    display: flex; align-items: center; gap: 7px;
+    padding: 10px 20px; border: none;
+    border-radius: 40px; background: var(--primary);
+    font-size: 13px; font-weight: 700; color: #fff;
+    cursor: pointer; font-family: inherit;
+    transition: background .2s; white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-new-profile:hover { background: var(--primary-hover); }
+
+  /* ── PROFILES GRID ── */
+  .profiles-grid {
+    display: flex; gap: 16px;
+    flex-wrap: wrap; margin-bottom: 32px;
+  }
+
+  /* ── PROFILE CARD ── */
+  .profile-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    width: 180px; min-width: 160px;
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    cursor: pointer; transition: all .25s;
+    position: relative;
+  }
+
+  .profile-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 6px 20px rgba(255,122,0,.12);
+    transform: translateY(-2px);
+  }
+
+  .profile-card.active-profile {
+    border-color: var(--primary);
+    background: var(--hover);
+  }
+
+  /* ACTIVE BADGE */
+  .active-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--secondary); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px;
+  }
+
+  /* AVATAR */
+  .profile-avatar-wrap {
+    position: relative; margin-bottom: 12px;
+  }
+
+  .profile-avatar {
+    width: 72px; height: 72px; border-radius: 50%;
+    object-fit: cover; display: block;
+    border: 3px solid var(--border);
+    background: var(--background);
+    font-size: 28px;
+    display: grid; place-items: center;
+  }
+
+  .profile-avatar img {
+    width: 100%; height: 100%;
+    border-radius: 50%; object-fit: cover;
+  }
+
+  .online-dot {
+    position: absolute; bottom: 3px; right: 3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--secondary);
+    border: 2px solid var(--surface);
+  }
+
+  .profile-name {
+    font-size: 14px; font-weight: 700;
+    color: var(--text); margin-bottom: 6px;
+  }
+
+  .profile-tags {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    justify-content: center; margin-bottom: 14px;
+  }
+
+  .profile-tag {
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 600;
+    background: var(--background);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .profile-action {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    width: 100%; padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px; font-weight: 600;
+    color: var(--primary);
+  }
+
+  /* ── ADD PROFILE CARD ── */
+  .add-profile-card {
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    width: 180px; min-width: 160px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; cursor: pointer;
+    transition: all .25s; gap: 10px;
+  }
+
+  .add-profile-card:hover {
+    border-color: var(--primary);
+    background: var(--hover);
+  }
+
+  .add-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 2px dashed var(--border);
+    display: grid; place-items: center;
+    font-size: 22px; color: var(--muted);
+    transition: all .2s;
+  }
+
+  .add-profile-card:hover .add-icon {
+    border-color: var(--primary); color: var(--primary);
+  }
+
+  .add-profile-label {
+    font-size: 13px; font-weight: 700; color: var(--text);
+  }
+
+  .add-profile-sub {
+    font-size: 11px; color: var(--muted); line-height: 1.5;
+  }
+
+  /* ── SECURITY TIP ── */
+  .security-tip {
+    background: #FEF2F2;
+    border: 1.5px solid #FECACA;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    display: flex; gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  .tip-icon-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--danger); color: #fff;
+    display: grid; place-items: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+
+  .tip-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--danger); margin-bottom: 4px;
+  }
+
+  .tip-desc { font-size: 12px; color: #B91C1C; line-height: 1.6; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 0 0 24px;
+  }
+
+  /* ── GROUP CONFIGS ── */
+  .group-title {
+    font-size: 16px; font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .config-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .config-item {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    cursor: pointer; transition: all .2s;
+  }
+
+  .config-item:hover { border-color: var(--primary); }
+
+  .config-left { display: flex; align-items: center; gap: 12px; }
+
+  .config-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--hover); display: grid;
+    place-items: center; font-size: 16px; flex-shrink: 0;
+  }
+
+  .config-label { font-size: 13px; font-weight: 700; }
+  .config-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .config-arrow { color: var(--muted); font-size: 14px; }
+
+  /* ── FOOTER ── */
+  footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+    background: var(--surface);
+  }
+
+  .footer-links { display: flex; gap: 16px; }
+  .footer-links a { color: var(--muted); text-decoration: none; }
+  .footer-links a:hover { color: var(--primary); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 200; display: none;
+    align-items: center; justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 28px; max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+  }
+
+  .modal h3 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+  .modal p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .modal-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+
+  .modal-field label {
+    font-size: 12px; font-weight: 700; color: var(--text);
+  }
+
+  .modal-field input, .modal-field select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px; padding: 9px 12px;
+    font-size: 13px; font-family: inherit;
+    color: var(--text); outline: none;
+    transition: border-color .2s;
+  }
+
+  .modal-field input:focus, .modal-field select:focus {
+    border-color: var(--primary);
+  }
+
+  .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .modal-tag {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    transition: all .2s;
+  }
+
+  .modal-tag.selected {
+    background: var(--primary); border-color: var(--primary); color: #fff;
+  }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  .modal-cancel {
+    padding: 9px 18px; border: 1.5px solid var(--border);
+    border-radius: 40px; background: var(--surface);
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    cursor: pointer; font-family: inherit;
+  }
+
+  .modal-confirm {
+    padding: 9px 18px; border: none;
+    border-radius: 40px; background: var(--primary);
+    font-size: 13px; font-weight: 700; color: #fff;
+    cursor: pointer; font-family: inherit;
+    transition: background .2s;
+  }
+
+  .modal-confirm:hover { background: var(--primary-hover); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: #fff;
+    padding: 10px 20px; border-radius: 40px;
+    font-size: 13px; font-weight: 500;
+    z-index: 9999; opacity: 0;
+    transition: opacity .3s, transform .3s;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .profile-card, .add-profile-card { animation: fadeUp .35s ease both; }
