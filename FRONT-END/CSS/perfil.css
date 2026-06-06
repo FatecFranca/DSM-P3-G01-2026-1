@@ -1,0 +1,4 @@
+.nav-item.active4 {
+    background: var(--border);
+    color: var(--text);
+  }

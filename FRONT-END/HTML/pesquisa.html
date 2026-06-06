@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisas</title>
+    <link rel="shortcut icon" href="../Images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../CSS/global.css">
+    <link rel="stylesheet" href="../CSS/pesquisa.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+     <aside class="sidebar">
+        <div class="logo">
+            <img src="../Images/logo.png" alt="Logo do Site">
+            <span class="logo-text">SafeBite</span>
+        </div>
+        <nav>
+            <a class="nav-item active" href="receitas.html">
+            <span class="icon">📖</span> Receitas
+            </a>
+            <a class="nav-item active2" href="pesquisa.html">
+            <span class="icon">🔍</span> Pesquisa
+            </a>
+            <a class="nav-item active3" href="publicacao.html">
+            <span class="icon">📰</span> Publicações
+            </a>
+            <a class="nav-item active4" href="perfil.html">
+            <span class="icon">👤</span> Perfil
+            </a>
+            <a class="nav-item" href="suporte.html">
+            <span class="icon">💬</span> Suporte
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="nav-item" href="#">
+            <span class="icon">⚙️</span> Configurações
+            </a>
+            <a class="nav-item" href="#">
+            <span class="icon">↪️</span> Sair
+            </a>
+        </div>
+    </aside>
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+            <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Buscar receitas seguras..." id="searchInput">
+            </div>
+            <div class="topbar-right">
+            <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+            <div class="user-chip">
+                <div class="avatar">AS</div>
+                <div class="user-info">
+                <div class="user-name">Ana Silva</div>
+                <div class="user-diet">Sem Glúten</div>
+                </div>
+            </div>
+            </div>
+        </header>
+
+          <!-- HERO DE PESQUISA -->
+  <div class="page-hero">
+    <h1>Descubra sua próxima refeição segura</h1>
+    <div class="hero-search">
+      <span style="font-size:18px">🔍</span>
+      <input type="text" placeholder="Busque por ingredientes, pratos ou dietas..." id="heroSearch">
+    </div>
+    <div class="active-filters" id="activeFilters">
+      <span class="filter-label">Filtros ativos:</span>
+      <span class="filter-chip" data-filter="glutenfree">Sem Glúten <span class="remove">×</span></span>
+      <span class="filter-chip" data-filter="safe">100% Seguros <span class="remove">×</span></span>
+      <button class="clear-all" id="clearAll">Limpar tudo</button>
+    </div>
+  </div>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="search-layout">
+
+    <!-- SIDEBAR DE FILTROS -->
+    <div class="filters-sidebar">
+      <div class="filters-header">
+        <span>⚙ REFINAR BUSCA</span>
+      </div>
+
+      <!-- Nível de Segurança -->
+      <div class="filter-group">
+        <div class="filter-group-title">Nível de Segurança <span>▾</span></div>
+        <label class="filter-option">
+          <input type="checkbox" checked="" id="f100"> <span>100% Seguros (Recomendado)</span>
+        </label>
+        <label class="filter-option">
+          <input type="checkbox" id="falerts"> <span>Mostrar Alertas (Risco Baixo)</span>
+        </label>
+      </div>
+
+      <!-- Tipo de Refeição -->
+      <div class="filter-group">
+        <div class="filter-group-title">Tipo de Refeição <span>▾</span></div>
+        <label class="filter-option"><input type="checkbox" data-cat="cafe"> <span>Café da Manhã</span></label>
+        <label class="filter-option"><input type="checkbox" data-cat="almoco"> <span>Almoço</span></label>
+        <label class="filter-option"><input type="checkbox" data-cat="jantar"> <span>Jantar</span></label>
+        <label class="filter-option"><input type="checkbox" data-cat="lanche"> <span>Lanches</span></label>
+        <label class="filter-option"><input type="checkbox" data-cat="sobre"> <span>Sobremesas</span></label>
+      </div>
+
+      <!-- Tempo -->
+      <div class="filter-group">
+        <div class="filter-group-title">Tempo de Preparo <span>▾</span></div>
+        <label class="filter-option"><input type="checkbox" data-time="15"> <span>Até 15 min</span></label>
+        <label class="filter-option"><input type="checkbox" data-time="30"> <span>15 – 30 min</span></label>
+        <label class="filter-option"><input type="checkbox" data-time="60"> <span>30 – 60 min</span></label>
+        <label class="filter-option"><input type="checkbox" data-time="99"> <span>Mais de 1 hora</span></label>
+      </div>
+
+      <!-- Dificuldade -->
+      <div class="filter-group">
+        <div class="filter-group-title">Dificuldade <span>▾</span></div>
+        <label class="filter-option"><input type="checkbox" data-diff="facil"> <span>Fácil</span></label>
+        <label class="filter-option"><input type="checkbox" data-diff="medio"> <span>Médio</span></label>
+        <label class="filter-option"><input type="checkbox" data-diff="dificil"> <span>Difícil</span></label>
+      </div>
+
+      <!-- Dica -->
+      <div class="safety-tip">
+        <strong>💡 DICA DE SEGURANÇA</strong>
+        Sempre verifique o rótulo dos produtos industrializados, mesmo que a receita seja marcada como 100% segura. Fabricantes podem mudar ingredientes de produção (contaminação cruzada).
+      </div>
+    </div>
+
+    <!-- ÁREA DE RESULTADOS -->
+    <div class="results-area">
+      <div class="results-header">
+        <div class="results-count">Encontramos <strong id="countNum">10</strong> receitas compatíveis com seu perfil.</div>
+        <div class="sort-select">
+          Ordenar por:
+          <select id="sortSelect">
+            <option value="relevance">Relevância</option>
+            <option value="time">Menor Tempo</option>
+            <option value="likes">Mais Curtidas</option>
+            <option value="recent">Mais Recentes</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- BANNER MODO SEGURANÇA -->
+      <div class="safety-banner">
+        <span>🛡️</span>
+        <span><strong>Modo de Segurança Ativo</strong> — Exibindo apenas receitas compatíveis com seu perfil. Filtros baseados em "Sem Glúten".</span>
+        <a href="#">Editar Perfil</a>
+      </div>
+
+      <!-- GRID -->
+      <div class="results-grid" id="resultsGrid">
+      <div class="result-card" style="animation-delay:0s" data-id="1">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&amp;q=80" alt="Panquecas de Aveia e Banana" loading="lazy">
+          <span class="meal-badge meal-cafe">Café da Manhã</span>
+        </div>
+        <div class="card-body">
+          <div class="card-author">Por: Chef Carla</div>
+          <div class="card-title-res">Panquecas de Aveia e Banana</div>
+          <div class="status-safe">✓ Seguro para você</div>
+          <div class="card-meta-res">
+            <span>⏱ 10 min</span>
+            <span>🍽 2 porções</span>
+          </div>
+          
+          <div class="card-footer-res">
+            <button class="ver-receita">Ver Receita ›</button>
+          </div>
+        </div>
+      </div>
+      <div class="result-card" style="animation-delay:0.05s" data-id="3">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&amp;q=80" alt="Salmão Grelhado com Ervas" loading="lazy">
+          <span class="meal-badge meal-jantar">Jantar</span>
+        </div>
+        <div class="card-body">
+          <div class="card-author">Por: Helena Santos</div>
+          <div class="card-title-res">Salmão Grelhado com Ervas</div>
+          <div class="status-safe">✓ Seguro para você</div>
+          <div class="card-meta-res">
+            <span>⏱ 25 min</span>
+            <span>🍽 2 porções</span>
+          </div>
+          
+          <div class="card-footer-res">
+            <button class="ver-receita">Ver Receita ›</button>
+          </div>
+        </div>
+      </div>
+      <div class="result-card" style="animation-delay:0.1s" data-id="4">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&amp;q=80" alt="Bowl de Quinoa e Vegetais" loading="lazy">
+          <span class="meal-badge meal-almoco">Almoço</span>
+        </div>
+        <div class="card-body">
+          <div class="card-author">Por: Nutr. Julia</div>
+          <div class="card-title-res">Bowl de Quinoa e Vegetais</div>
+          <div class="status-safe">✓ Seguro para você</div>
+          <div class="card-meta-res">
+            <span>⏱ 20 min</span>
+            <span>🍽 2 porções</span>
+          </div>
+          
+          <div class="card-footer-res">
+            <button class="ver-receita">Ver Receita ›</button>
+          </div>
+        </div>
+      </div>
+      <div class="result-card" style="animation-delay:0.15000000000000002s" data-id="6">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400&amp;q=80" alt="Risoto de Cogumelos" loading="lazy">
+          <span class="meal-badge meal-jantar">Jantar</span>
+        </div>
+        <div class="card-body">
+          <div class="card-author">Por: Chef Pedro</div>
+          <div class="card-title-res">Risoto de Cogumelos</div>
+          <div class="status-safe">✓ Seguro para você</div>
+          <div class="card-meta-res">
+            <span>⏱ 40 min</span>
+            <span>🍽 2 porções</span>
+          </div>
+          
+          <div class="card-footer-res">
+            <button class="ver-receita">Ver Receita ›</button>
+          </div>
+        </div>
+      </div>
+      <div class="result-card" style="animation-delay:0.2s" data-id="7">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&amp;q=80" alt="Tapioca com Frango Desfiado" loading="lazy">
+          <span class="meal-badge meal-veg">Lanche</span>
+        </div>
+        <div class="card-body">
+          <div class="card-author">Por: Cozinha Nordestina</div>
+          <div class="card-title-res">Tapioca com Frango Desfiado</div>
+          <div class="status-safe">✓ Seguro para você</div>
+          <div class="card-meta-res">
+            <span>⏱ 15 min</span>
+            <span>🍽 1 porções</span>
+          </div>
+          
+          <div class="card-footer-res">
+            <button class="ver-receita">Ver Receita ›</button>
+          </div>
+        </div>
+      </div>
+      <div class="result-card" style="animation-delay:0.25s" data-id="8">
+        <div class="card-img">
+          <img src="https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&amp;q=80" alt="Smoothie Verde Detox" loading="lazy">
+          <span class="meal-badge meal-cafe">Café da Manhã</span>
+        </div>
+        <div class="card-body">
+          <div class="card-author">Por: Vida Saudável</div>
+          <div class="card-title-res">Smoothie Verde Detox</div>
+          <div class="status-safe">✓ Seguro para você</div>
+          <div class="card-meta-res">
+            <span>⏱ 5 min</span>
+            <span>🍽 1 porções</span>
+          </div>
+          
+          <div class="card-footer-res">
+            <button class="ver-receita">Ver Receita ›</button>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- PAGINAÇÃO -->
+      <div class="pagination" id="pagination"><button class="page-btn nav" disabled="" onclick="goPage(0)">← Anterior</button><button class="page-btn active" onclick="goPage(1)">1</button><button class="page-btn " onclick="goPage(2)">2</button><button class="page-btn nav" onclick="goPage(2)">Próxima →</button></div>
+    </div>
+  </div>
+
+
+        <footer>
+            <span>© 2026 SafeBite. Todos os direitos reservados.</span>
+            <div class="footer-links">
+                <a href="#">Privacidade</a>
+                <a href="#">Termos</a>
+                <a href="#">Suporte</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+    // ── MOCK DATA ──
+    const recipes = [
+    { id:1, title:"Panquecas de Aveia e Banana", author:"Chef Carla", cat:"cafe", catLabel:"Café da Manhã", catClass:"meal-cafe", time:10, diff:"Fácil", portions:2, status:"safe", img:"https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80" },
+    { id:2, title:"Lasanha Bolonhesa Clássica", author:"Ricardo Rosa", cat:"almoco", catLabel:"Almoço", catClass:"meal-almoco", time:60, diff:"Médio", portions:6, status:"danger", conflicts:["Glúten","Lactose","Frutos do Mar"], img:"https://images.unsplash.com/photo-1574894709920-11b28e7367e3?w=400&q=80" },
+    { id:3, title:"Salmão Grelhado com Ervas", author:"Helena Santos", cat:"jantar", catLabel:"Jantar", catClass:"meal-jantar", time:25, diff:"Fácil", portions:2, status:"safe", img:"https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80" },
+    { id:4, title:"Bowl de Quinoa e Vegetais", author:"Nutr. Julia", cat:"almoco", catLabel:"Almoço", catClass:"meal-almoco", time:20, diff:"Fácil", portions:2, status:"safe", img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80" },
+    { id:5, title:"Bolo de Chocolate Low Carb", author:"Doces Saudáveis", cat:"sobre", catLabel:"Sobremesa", catClass:"meal-sobre", time:45, diff:"Médio", portions:8, status:"attention", attentionMsg:"Atenção: Lactose", conflicts:["Lactose"], img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&q=80" },
+    { id:6, title:"Risoto de Cogumelos", author:"Chef Pedro", cat:"jantar", catLabel:"Jantar", catClass:"meal-jantar", time:40, diff:"Médio", portions:2, status:"safe", img:"https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400&q=80" },
+    { id:7, title:"Tapioca com Frango Desfiado", author:"Cozinha Nordestina", cat:"lanche", catLabel:"Lanche", catClass:"meal-veg", time:15, diff:"Fácil", portions:1, status:"safe", img:"https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80" },
+    { id:8, title:"Smoothie Verde Detox", author:"Vida Saudável", cat:"cafe", catLabel:"Café da Manhã", catClass:"meal-cafe", time:5, diff:"Fácil", portions:1, status:"safe", img:"https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=400&q=80" },
+    { id:9, title:"Frango ao Curry com Arroz", author:"Chef Arabe", cat:"almoco", catLabel:"Almoço", catClass:"meal-almoco", time:35, diff:"Médio", portions:4, status:"safe", img:"https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=400&q=80" },
+    { id:10, title:"Wrap de Grão-de-Bico", author:"Green Kitchen", cat:"lanche", catLabel:"Lanche", catClass:"meal-veg", time:20, diff:"Fácil", portions:2, status:"safe", img:"https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80" },
+    { id:11, title:"Sopa de Lentilha", author:"Cozinha Árabe", cat:"jantar", catLabel:"Jantar", catClass:"meal-jantar", time:40, diff:"Fácil", portions:4, status:"safe", img:"https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80" },
+    { id:12, title:"Açaí Bowl com Granola", author:"Vida Natural", cat:"cafe", catLabel:"Café da Manhã", catClass:"meal-cafe", time:5, diff:"Fácil", portions:1, status:"safe", img:"https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&q=80" },
+    ];
+
+    // ── ESTADO ──
+    let currentPage = 1;
+    const perPage = 6;
+    let filtered = [...recipes];
+
+    // ── RENDER GRID ──
+    function renderGrid() {
+    const grid = document.getElementById('resultsGrid');
+    const start = (currentPage - 1) * perPage;
+    const page = filtered.slice(start, start + perPage);
+
+    document.getElementById('countNum').textContent = filtered.length;
+
+    if (page.length === 0) {
+        grid.innerHTML = `<p style="color:var(--muted);font-size:14px;grid-column:1/-1;padding:40px 0;text-align:center">😕 Nenhuma receita encontrada.</p>`;
+        return;
+    }
+
+    grid.innerHTML = page.map((r, i) => {
+        const statusHtml = r.status === 'safe'
+        ? `<div class="status-safe">✓ Seguro para você</div>`
+        : r.status === 'danger'
+        ? `<div class="status-warning">⚠ COMPONENTES DE RISCO<div class="conflict-tags">${r.conflicts.join(', ')}</div></div>`
+        : `<div class="status-attention">⚠ ${r.attentionMsg}</div>`;
+
+        const conflictLine = r.conflicts
+        ? `<div class="conflict-line">${r.conflicts.map(c => `<span>${c}</span>`).join('')}</div>`
+        : '';
+
+        return `
+        <div class="result-card" style="animation-delay:${i*0.05}s" data-id="${r.id}">
+            <div class="card-img">
+            <img src="${r.img}" alt="${r.title}" loading="lazy">
+            <span class="meal-badge ${r.catClass}">${r.catLabel}</span>
+            </div>
+            <div class="card-body">
+            <div class="card-author">Por: ${r.author}</div>
+            <div class="card-title-res">${r.title}</div>
+            ${statusHtml}
+            <div class="card-meta-res">
+                <span>⏱ ${r.time} min</span>
+                <span>🍽 ${r.portions} porções</span>
+            </div>
+            ${conflictLine}
+            <div class="card-footer-res">
+                <button class="ver-receita">Ver Receita ›</button>
+            </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    renderPagination();
+    }
+
+    // ── PAGINAÇÃO ──
+    function renderPagination() {
+    const total = Math.ceil(filtered.length / perPage);
+    const pag = document.getElementById('pagination');
+    if (total <= 1) { pag.innerHTML = ''; return; }
+
+    let html = `<button class="page-btn nav" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">← Anterior</button>`;
+
+    for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || Math.abs(i - currentPage) <= 1) {
+        html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+        } else if (Math.abs(i - currentPage) === 2) {
+        html += `<span style="color:var(--muted);padding:0 2px">…</span>`;
+        }
+    }
+
+    html += `<button class="page-btn nav" ${currentPage===total?'disabled':''} onclick="goPage(${currentPage+1})">Próxima →</button>`;
+    pag.innerHTML = html;
+    }
+
+    function goPage(n) {
+    currentPage = n;
+    renderGrid();
+    document.querySelector('.results-area').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── BUSCA ──
+    function doSearch() {
+    const term = document.getElementById('heroSearch').value.toLowerCase().trim();
+    filtered = recipes.filter(r =>
+        r.title.toLowerCase().includes(term) ||
+        r.author.toLowerCase().includes(term) ||
+        r.catLabel.toLowerCase().includes(term)
+    );
+    currentPage = 1;
+    renderGrid();
+    }
+
+    document.getElementById('heroSearch').addEventListener('input', doSearch);
+    document.getElementById('topSearch').addEventListener('input', e => {
+    document.getElementById('heroSearch').value = e.target.value;
+    doSearch();
+    });
+
+    // ── FILTROS ──
+    document.querySelectorAll('.filter-option input').forEach(cb => {
+    cb.addEventListener('change', applyFilters);
+    });
+
+    function applyFilters() {
+    const cats = [...document.querySelectorAll('[data-cat]:checked')].map(c => c.dataset.cat);
+    const onlySafe = document.getElementById('f100').checked;
+    const term = document.getElementById('heroSearch').value.toLowerCase().trim();
+
+    filtered = recipes.filter(r => {
+        const matchCat = cats.length === 0 || cats.includes(r.cat);
+        const matchSafe = !onlySafe || r.status === 'safe';
+        const matchSearch = r.title.toLowerCase().includes(term) || r.author.toLowerCase().includes(term);
+        return matchCat && matchSafe && matchSearch;
+    });
+
+    currentPage = 1;
+    renderGrid();
+    }
+
+    // ── FILTROS ATIVOS (chips) ──
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        chip.remove();
+        applyFilters();
+    });
+    });
+
+    document.getElementById('clearAll').addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.remove());
+    document.querySelectorAll('.filter-option input').forEach(cb => cb.checked = false);
+    filtered = [...recipes];
+    currentPage = 1;
+    renderGrid();
+    });
+
+    // ── ORDENAÇÃO ──
+    document.getElementById('sortSelect').addEventListener('change', function() {
+    if (this.value === 'time') filtered.sort((a,b) => a.time - b.time);
+    else if (this.value === 'recent') filtered.sort((a,b) => b.id - a.id);
+    else filtered = [...recipes];
+    currentPage = 1;
+    renderGrid();
+    });
+
+    // ── INIT ──
+    renderGrid();
+</script>
+</body>
+</html>
