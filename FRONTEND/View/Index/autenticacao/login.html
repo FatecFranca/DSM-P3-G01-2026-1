@@ -1,34 +1,70 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - SafeBite</title>
-  <link rel="icon" href="/Images/favicon.ico">
+  <title>Entrar — SafeBite</title>
+  <link rel="icon" href="../../Images/favicon.ico">
   <link rel="stylesheet" href="../../Estilos/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="tela-login">
-  <a href="inicio.html" class="btn-voltar">Voltar</a>
 
-  <div class="form-container">  <img src="../../Images/logo.png"/>
-    <h2>Login</h2>
-    <form id="form-login">
-      
-      <div class="input-group">
-        <i class="fa-solid fa-user"></i>
-        <input type="email" id="email" placeholder="Insira seu email" />
+  <a href="inicio.html" class="btn-voltar">← Voltar</a>
+
+  <!-- Painel esquerdo: imagem -->
+  <div class="panel-image">
+    <img src="../../Images/Imagem3.jpg" alt="Comida" />
+    <div class="panel-image-overlay"></div>
+  </div>
+
+  <!-- Painel direito: formulário -->
+  <div class="panel-form">
+    <div class="form-card">
+
+      <div class="form-logo">
+        <img src="../../Images/logo.png" alt="SafeBite" />
       </div>
 
-      <div class="input-group">
-        <i class="fa-solid fa-lock"></i>
-        <input type="password" id="senha" placeholder="Insira a senha" />
-      </div>
-      <label>
-        <a href="recuperar-senha.html" style="color: inherit; text-decoration: underline;">Esqueceu sua senha? Clique aqui!</a>
-      </label>
+      <h1 class="form-title">Bem-vindo ao SafeBite</h1>
+      <p class="form-subtitle">Entre para gerenciar suas restrições e descobrir receitas seguras.</p>
 
-      <button type="submit" class="btn-grad">Concluir</button>
-    </form>
+      <form id="form-login">
+
+        <div class="field">
+          <label class="field-label" for="email">E-mail</label>
+          <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="seu@email.com" required />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">Senha</span>
+            <a href="recuperar-senha.html" class="field-link">Esqueci minha senha</a>
+          </div>
+          <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="senha" placeholder="••••••••" required />
+          </div>
+        </div>
+
+        <label class="check-label">
+          <input type="checkbox" id="manter-conectado" />
+          Manter-me conectado
+        </label>
+
+        <button type="submit" class="btn-submit">Entrar →</button>
+
+        <div class="divider-label">OU CONTINUE COM</div>
+
+        <p class="signup-link">Não tem uma conta? <a href="cadastro.html">Criar conta agora</a></p>
+
+        <p class="secure-note">🔒 Conexão segura e criptografada</p>
+
+      </form>
+    </div>
   </div>
 
   <!-- Scripts necessários -->

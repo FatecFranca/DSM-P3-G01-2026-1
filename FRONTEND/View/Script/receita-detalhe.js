@@ -1,4 +1,4 @@
-﻿// Layout gerenciado por Script/components/layout.js
+// Layout gerenciado por Script/components/layout.js
 
 // --- Função para carregar receita da API ---
 async function carregarReceita() {
@@ -106,8 +106,19 @@ function mapearDadosReceita(receitaData, userRestrictionIds = new Set()) {
         try {
             ingredientes = JSON.parse(receitaData.ingredientes);
         } catch {
-            // Se não for JSON, tratar como string simples separada por vírgula
-            ingredientes = receitaData.ingredientes.split(',').map(i => i.trim()).filter(i => i);
+            const raw = receitaData.ingredientes.trim();
+            // Tenta quebrar por linha primeiro; se só tiver uma linha, tenta ponto-e-vírgula, depois vírgula
+            const porLinha = raw.split(/\r?\n/).map(i => i.trim().replace(/^[-•*]\s*/, '')).filter(i => i);
+            if (porLinha.length > 1) {
+                ingredientes = porLinha;
+            } else {
+                const porPvg = raw.split(';').map(i => i.trim()).filter(i => i);
+                if (porPvg.length > 1) {
+                    ingredientes = porPvg;
+                } else {
+                    ingredientes = raw.split(',').map(i => i.trim()).filter(i => i);
+                }
+            }
         }
     }
     
@@ -117,22 +128,19 @@ function mapearDadosReceita(receitaData, userRestrictionIds = new Set()) {
         modoPreparo = receitaData.modo_preparo;
     } else if (typeof receitaData.modo_preparo === 'string') {
         const texto = receitaData.modo_preparo.trim();
-        
-        // Se já tem quebras de linha, usar isso
-        if (texto.includes('\n')) {
-            modoPreparo = texto
-                .split(/\n+/)
-                .map(passo => passo.trim())
-                .filter(passo => passo.length > 0);
+
+        // 1. Quebra por linha (mais comum quando o backend já separa)
+        const porLinha = texto.split(/\r?\n/).map(p => p.trim()).filter(p => p.length > 0);
+        if (porLinha.length > 1) {
+            // Remove numeração inicial tipo "1." ou "1)" de cada linha
+            modoPreparo = porLinha.map(p => p.replace(/^\d+[.)\s]+/, '').trim());
         } else {
-            // Tentar dividir por padrões como "1.", "2.", etc.
-            const passos = texto.split(/(?=\d+\.\s)|(?<=\.)\s+(?=[A-Z])/);
-            modoPreparo = passos
-                .map(passo => passo.trim().replace(/^\d+\.\s*/, ''))
-                .filter(passo => passo.length > 0);
-            
-            // Se não conseguiu dividir bem, usar a string inteira como um único passo
-            if (modoPreparo.length === 0 || modoPreparo.length === 1) {
+            // 2. Quebra por padrão "1. " "2. " no início de segmento
+            const porNumero = texto.split(/(?=\b\d+\.\s)/).map(p => p.trim()).filter(p => p.length > 0);
+            if (porNumero.length > 1) {
+                modoPreparo = porNumero.map(p => p.replace(/^\d+\.\s*/, '').trim());
+            } else {
+                // 3. Última opção: texto inteiro como passo único
                 modoPreparo = [texto];
             }
         }
