@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Script para modal de restrições alimentares no menu principal
- * Adaptado do código de tela_4 - restricoes.js
+ * Adaptado do código de restricoes.js
  */
 
 // Verificar se as dependências estão carregadas

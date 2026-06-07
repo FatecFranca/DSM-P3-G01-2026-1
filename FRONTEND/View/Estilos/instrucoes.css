@@ -1,0 +1,60 @@
+/* Página Instruções */
+
+.text {
+  padding: var(--content-offset) 42px 40px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.text h2 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.text > p:first-of-type {
+  margin: 0 0 26px;
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.text h3 {
+  margin: 28px 0 14px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.text h3:first-of-type {
+  margin-top: 0;
+}
+
+.text p:not(:first-of-type) {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px 24px;
+  margin: 0 0 14px;
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: 0.25s ease;
+}
+
+.text p:not(:first-of-type):hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 122, 0, 0.2);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+  .text {
+    padding: calc(var(--header-height) + 24px) 20px 30px;
+  }
+
+  .text h2 {
+    font-size: 1.6rem;
+  }
+}

@@ -1,0 +1,170 @@
+/* Página Receitas */
+
+.conteudo-receitas {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--content-offset) 42px 42px;
+}
+
+.conteudo-receitas::before {
+  content: "Descubra sua próxima refeição segura";
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 22px;
+}
+
+.barra-pesquisa {
+  position: relative;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.icone-lupa {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  font-size: 18px;
+  z-index: 2;
+}
+
+.campo-pesquisa {
+  width: 100%;
+  height: 48px;
+  padding: 0 18px 0 46px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: 0.25s ease;
+}
+
+.campo-pesquisa:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.14);
+}
+
+.campo-pesquisa::placeholder {
+  color: var(--text-light);
+}
+
+.titulo-secao {
+  margin: 26px 0 18px;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.resultado-busca {
+  margin-bottom: 18px;
+}
+
+.texto-resultado {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 14px;
+}
+
+.texto-resultado span {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.nenhum-resultado {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 50px 24px;
+  text-align: center;
+}
+
+.emoji-triste {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+}
+
+.mensagem-sem-resultado {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.grid-receitas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.card-receita {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: 0.25s ease;
+}
+
+.card-receita:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 122, 0, 0.25);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.08);
+}
+
+.card-receita img {
+  width: 100%;
+  height: 185px;
+  object-fit: cover;
+  display: block;
+}
+
+.nome-receita {
+  margin: 0;
+  padding: 16px 18px;
+  min-height: 70px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.nome-receita::after {
+  content: "Seguro para você";
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+body.menu-open .conteudo-receitas {
+  margin-left: var(--menu-width);
+  max-width: calc(960px + var(--menu-width));
+}
+
+@media (max-width: 768px) {
+  .conteudo-receitas {
+    padding: calc(var(--header-height) + 24px) 20px 32px;
+  }
+
+  .conteudo-receitas::before {
+    font-size: 1.55rem;
+  }
+
+  .grid-receitas {
+    grid-template-columns: 1fr;
+  }
+
+  .card-receita img {
+    height: 170px;
+  }
+
+  body.menu-open .conteudo-receitas {
+    margin-left: 0;
+  }
+}

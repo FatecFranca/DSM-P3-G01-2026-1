@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Script para página de cadastro
  * Integra com a API do backend
  */
@@ -29,7 +29,7 @@ function init() {
 
   // Verificar se já está logado - se sim, redirecionar para menu principal
   if (window.apiService?.isAuthenticated()) {
-    window.location.href = '../tela_4 - menu-principal.html';
+    window.location.href = window.ROUTES?.appPage?.('home') || '/Index/home.html';
     return;
   }
 
@@ -113,7 +113,7 @@ async function handleCadastro(e) {
       // Sempre redirecionar para o menu principal
       // Se tem_restricao=true, o modal de restrições será aberto automaticamente
       setTimeout(() => {
-        window.location.href = '../tela_4 - menu-principal.html';
+        window.location.href = window.ROUTES?.appPage?.('home') || '/Index/home.html';
       }, 1000);
     }
   } catch (error) {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Script para página de login
  * Integra com a API do backend
  */
@@ -53,7 +53,7 @@ function init() {
 
   // Verificar se já está logado
   if (window.apiService?.isAuthenticated()) {
-    window.location.href = '../tela_4 - menu-principal.html';
+        window.location.href = window.ROUTES?.appPage?.('home') || '/Index/home.html';
     return;
   }
 
@@ -138,40 +138,40 @@ async function handleLogin(e) {
         button: btnSubmit,
         errorContainer: messageContainer,
         loadingMessage: 'Entrando...',
-        successMessage: 'Login realizado com sucesso!'
+        successMessage: 'Login realizado com sucesso!',
+        skipSessionRedirect: true
       }
     );
 
+    if (!response?.data?.token && !window.apiService.isAuthenticated()) {
+      window.utils?.showError('Login não retornou token válido. Tente novamente.', messageContainer, { skipSessionRedirect: true });
+      return;
+    }
+
     if (response && response.data) {
-      // Verificar se o usuário tem restrição e se já cadastrou restrições
       const user = response.data.user;
+      const homeUrl = window.ROUTES?.appPage?.('home') || '/Index/home.html';
+      const restricoesUrl = window.ROUTES?.authPage?.('restricoes') || '/Index/autenticacao/restricoes.html';
+
       if (user && user.tem_restricao) {
-        // Buscar se o usuário já tem restrições cadastradas
         try {
           const restrictionsResponse = await window.apiService.getUserRestrictions();
-          const hasRestrictions = restrictionsResponse && restrictionsResponse.success 
-            && restrictionsResponse.data && restrictionsResponse.data.length > 0;
+          const hasRestrictions = restrictionsResponse?.success
+            && Array.isArray(restrictionsResponse.data)
+            && restrictionsResponse.data.length > 0;
 
           setTimeout(() => {
-            if (!hasRestrictions) {
-              // Se tem_restricao=true mas não tem restrições cadastradas, forçar tela de restrições
-              window.location.href = 'tela_4 - restricoes.html';
-            } else {
-              // Já tem restrições cadastradas, ir para menu principal
-              window.location.href = '../tela_4 - menu-principal.html';
-            }
+            window.location.href = hasRestrictions ? homeUrl : restricoesUrl;
           }, 500);
-        } catch (error) {
-          console.error('Erro ao verificar restrições:', error);
-          // Em caso de erro, redirecionar para tela de restrições para garantir
+        } catch (restrictionsError) {
+          console.warn('Não foi possível verificar restrições após login:', restrictionsError);
           setTimeout(() => {
-            window.location.href = 'tela_4 - restricoes.html';
+            window.location.href = homeUrl;
           }, 500);
         }
       } else {
-        // Não tem restrição, ir direto para menu principal
         setTimeout(() => {
-          window.location.href = '../tela_4 - menu-principal.html';
+          window.location.href = homeUrl;
         }, 500);
       }
     }

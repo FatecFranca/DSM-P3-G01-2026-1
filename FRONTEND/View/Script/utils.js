@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Utilitários para tratamento de erros e loading states
  */
 
@@ -7,7 +7,12 @@
  * @param {string} redirectUrl - URL para redirecionar se não autenticado (padrão: tela inicial)
  * @returns {boolean} - true se autenticado, false caso contrário
  */
-function requireAuth(redirectUrl = 'autenticacao/tela_1 - inicial.html') {
+function requireAuth(redirectUrl = null) {
+  if (!redirectUrl) {
+    redirectUrl = window.ROUTES?.authPage?.('inicio')
+      || window.ROUTES?.url?.(window.ROUTES?.auth?.inicio || 'autenticacao/inicio.html')
+      || '/Index/autenticacao/inicio.html';
+  }
   // Verificar se apiService está disponível
   if (!window.apiService) {
     console.warn('apiService não disponível. Redirecionando para tela inicial...');
@@ -30,25 +35,49 @@ window.utils = window.utils || {};
 window.utils.requireAuth = requireAuth;
 
 /**
+ * Resolve URL de mídia retornada pela API (imagens de receitas, perfil, etc.)
+ */
+function resolveMediaUrl(path) {
+  if (window.CONFIG?.resolveMediaUrl) {
+    return window.CONFIG.resolveMediaUrl(path);
+  }
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  const server = (window.CONFIG?.SERVER_URL || 'http://localhost:3001').replace(/\/$/, '');
+  if (path.startsWith('/')) return `${server}${path}`;
+  return `${server}/uploads/${path}`;
+}
+
+/**
  * Exibe uma mensagem de erro amigável para o usuário
  * @param {Error|string} error - Erro ou mensagem de erro
  * @param {HTMLElement} container - Container onde exibir a mensagem (opcional)
+ * @param {object} options - Opções (skipSessionRedirect: não redirecionar em 401)
  */
-function showError(error, container = null) {
+function showError(error, container = null, options = {}) {
   let message = 'Ocorreu um erro inesperado. Tente novamente.';
 
   if (typeof error === 'string') {
     message = error;
   } else if (error instanceof Error) {
     message = error.message || message;
-    
-    // Mensagens mais amigáveis para erros comuns
+
     if (error.status === 401) {
-      message = 'Sessão expirada. Por favor, faça login novamente.';
-      // Redirecionar para tela de login
-      setTimeout(() => {
-        window.location.href = '/Index/autenticacao/tela_3 - login.html';
-      }, 2000);
+      const apiMessage = (error.data?.message || error.message || '').toLowerCase();
+      const isCredentialError = /inválid|invalid|incorret|credencial|email ou senha|senha incorreta/.test(apiMessage);
+      const onAuthPage = /login|cadastro|inicio|autenticacao/.test(window.location.pathname);
+
+      if (options.skipSessionRedirect || isCredentialError || onAuthPage) {
+        message = error.data?.message || error.message || 'Email ou senha inválidos.';
+      } else {
+        message = 'Sessão expirada. Por favor, faça login novamente.';
+        setTimeout(() => {
+          const loginPath = window.ROUTES?.authPage?.('login')
+            || window.ROUTES?.url?.(window.ROUTES?.auth?.login || 'autenticacao/login.html')
+            || '/Index/autenticacao/login.html';
+          window.location.href = loginPath;
+        }, 2000);
+      }
     } else if (error.status === 403) {
       message = 'Você não tem permissão para realizar esta ação.';
     } else if (error.status === 404) {
@@ -217,7 +246,8 @@ async function executeWithLoading(asyncFunction, options = {}) {
     button = null,
     errorContainer = null,
     successMessage = null,
-    loadingMessage = 'Carregando...'
+    loadingMessage = 'Carregando...',
+    skipSessionRedirect = false
   } = options;
 
   let removeLoading = null;
@@ -243,8 +273,9 @@ async function executeWithLoading(asyncFunction, options = {}) {
 
     return result;
   } catch (error) {
-    // Mostrar erro
-    showError(error, errorContainer);
+    showError(error, errorContainer, {
+      skipSessionRedirect: options.skipSessionRedirect
+    });
     throw error;
   } finally {
     // Remover loading
@@ -334,7 +365,7 @@ async function carregarFotoPerfilHeader() {
 
     // Se tem foto, mostrar foto e esconder iniciais
     if (userData.foto_perfil) {
-      fotoPerfilImg.src = userData.foto_perfil;
+      fotoPerfilImg.src = resolveMediaUrl(userData.foto_perfil);
       fotoPerfilImg.alt = `Foto de ${userData.nome_completo || 'perfil'}`;
       fotoPerfilImg.style.display = 'block';
       iniciaisPerfil.style.display = 'none';
@@ -394,7 +425,9 @@ window.utils = {
   executeWithLoading,
   extrairIniciais,
   carregarFotoPerfilHeader,
-  attachInteractiveEffects
+  attachInteractiveEffects,
+  requireAuth,
+  resolveMediaUrl
 };
 
 window.attachInteractiveEffects = attachInteractiveEffects;
@@ -402,3 +435,4 @@ window.attachInteractiveEffects = attachInteractiveEffects;
 // Exportar também globalmente para facilitar acesso
 window.extrairIniciais = extrairIniciais;
 window.carregarFotoPerfilHeader = carregarFotoPerfilHeader;
+window.resolveMediaUrl = resolveMediaUrl;

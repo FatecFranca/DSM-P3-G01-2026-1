@@ -138,7 +138,7 @@ class ApiService {
 
       // Tratar erros de rede (incluindo CORS que não conseguiu conectar)
       if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('Failed to fetch'))) {
-        throw new Error('Erro de conexão. Verifique se o servidor backend está rodando em http://localhost:3001');
+        throw new Error(`Erro de conexão. Verifique se o servidor backend está rodando em ${window.CONFIG?.SERVER_URL || 'http://localhost:3001'}`);
       }
 
       // Tratar erros de CORS
